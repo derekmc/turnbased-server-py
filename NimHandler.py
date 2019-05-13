@@ -6,6 +6,9 @@ except:
     print("jsonschema not available, no validation will be performed.")
     validate = lambda x,y: True
 
+Version = "dev"
+GameParadigm = "Nim"
+
 NimStateSchema = {
     "type": "object",
     "additionalProperties": False,
@@ -24,6 +27,9 @@ NimInitSchema = {
     "additionalProperties": False,
     "properties": {
         "stones": {"type": "integer"}}}
+
+def turn_seat(turn, seats=2):
+    return (turn - 1)%seats + 1
 
 
 
@@ -47,7 +53,7 @@ def verify(data, move, seat):
     assert take ==1 or take==2,    "must take 1 or 2 stones"
     assert take <= stones,         "cannot take " + take + " stones, only " + stones + " remains."
     assert seat==1 or seat==2,     "only 2 seats allowed"
-    assert seat == [2, 1][turn%2], "not your turn"
+    assert seat == turn_seat(turn), "not your turn"
     return True
     # print(state, move)
 
@@ -63,7 +69,7 @@ def score(data, seat=0):
     stones = data['stones']
     turn = data['turn']
     if stones <= 0:
-        return {'winner': [2, 1][turn%2], 'finished': True}
+        return {'winner': turn_seat(turn), 'finished': True}
     return {}
 
 
