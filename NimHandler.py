@@ -1,7 +1,7 @@
 
 import json
 try:
-    from jsonchema import validate
+    from jsonschema import validate
 except:
     print("jsonschema not available, no validation will be performed.")
     validate = lambda x,y: True
