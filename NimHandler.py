@@ -69,7 +69,7 @@ def score(data, seat=0):
     stones = data['stones']
     turn = data['turn']
     if stones <= 0:
-        return {'winner': turn_seat(turn), 'finished': True}
+        return {'winners': turn_seat(turn), 'finished': True}
     return {}
 
 
