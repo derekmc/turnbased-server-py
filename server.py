@@ -81,7 +81,11 @@ def games_new_page():
 
 @app.route('/games/new', method='POST')
 def games_new_page():
-    return "new game post handler"
+    s = " TODO create new game<br>"
+    for key in request.forms:
+        s += key + ": " + request.forms[key] + "<br>"
+    return s
+    #return "new game post handler"
 
 @app.route('/game/<id:int>/sit')
 def game_sit(id):
