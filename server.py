@@ -75,7 +75,11 @@ newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/games/new', method='GET')
 def games_new_page():
     data = {
-        "paradigms" : ["Nim", "Chess"],
+        "paradigms" : [
+          {"name": "Nim", "version":"dev", "min_players": 2, "max_players":2 },
+          {"name": "Chess", "version":"dev", "min_players": 2, "max_players":2 },
+          {"name": "Chinese Chess", "version":"dev", "min_players": 2, "max_players":6 },
+        ],
     }
     return newgame_template.render(data=data)
 

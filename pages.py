@@ -29,6 +29,7 @@ new_game_tmpl = """
       a:visited{ color: blue; }
     </style>
     <script>
+      window.addEventListener("load", init);
       function id(x){ return document.getElementById(x); }
       function int(x){ return x? parseInt(x) : 0; }
       function updateMin(){
@@ -41,6 +42,28 @@ new_game_tmpl = """
         var max = int(id("max_players").value);
         if(max < min) id("max_players").value = min;
       }
+      % import json
+      var paradigm_list = {{! data['paradigms']}}
+      var paradigms = {};
+      for(var i=0; i<paradigm_list.length; ++i){
+          var paradigm = paradigm_list[i];
+          paradigms[paradigm.name] = paradigm; }
+      function updateParadigm(name){
+         var name = id("game_paradigm").value;
+         var paradigm = paradigms[name];
+         if(!paradigm) return;
+         var min = paradigm.min_players;
+         var max = paradigm.max_players;
+         id("min_players").min = min;
+         id("min_players").max = max;
+         id("min_players").value = min;
+         id("max_players").min = min;
+         id("max_players").max = max;
+         id("max_players").value = max;
+      }
+      function init(){
+         updateParadigm();
+      }
     </script>
   </head>
   <body>
@@ -51,9 +74,9 @@ new_game_tmpl = """
         <tr>
           <td> Game Type </td>
           <td>
-            <select name="game_paradigm">
+            <select name="game_paradigm" id="game_paradigm" onchange="updateParadigm();">
               %for paradigm in data['paradigms']:
-                <option value="{{paradigm}}"> {{paradigm}} </option>
+                <option value="{{paradigm['name']}}"> {{paradigm['name']}} </option>
               %end
             </select><br>
           </td>
