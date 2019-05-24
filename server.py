@@ -29,6 +29,9 @@ db = pickledb.load(DATA_FOLDER + "/" + DB_FILE, True)
 app = Bottle()
 
 
+# TODO list paradigms
+
+
 def gen_randomstring(n):
     return ''.join(random.choice(string.ascii_letters) for x in range(n))
 
@@ -37,7 +40,8 @@ def gen_cookie():
         cookie = gen_randomstring(COOKIE_LEN)
         if not db.get(COOKIE_KEY + cookie):
             return cookie
-    raise Exception("Could not find available cookie")
+    raise Exception("No cookies left in the jar")
+    # raise Exception("Could not find available cookie")
 
 
 def get_session():
@@ -57,19 +61,27 @@ def get_session():
 @app.route('/')
 def index():
     cookie = get_session()
-    return pages.index_src
+    return pages.index_html
     
 @app.route('/docs')
 def docs():
-    return pages.doc_src
+    return pages.docs_html
 
 @app.route('/games/list')
 def games_list():
     pass
 
-@app.route('/games/new')
-def games_new():
-    pass
+newgame_template = SimpleTemplate(pages.new_game_tmpl)
+@app.route('/games/new', method='GET')
+def games_new_page():
+    data = {
+        "paradigms" : ["Nim", "Chess"],
+    }
+    return newgame_template.render(data=data)
+
+@app.route('/games/new', method='POST')
+def games_new_page():
+    return "new game post handler"
 
 @app.route('/game/<id:int>/sit')
 def game_sit(id):

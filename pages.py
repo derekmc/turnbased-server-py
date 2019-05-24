@@ -1,5 +1,5 @@
 
-index_src = """
+index_html = """
 <!doctype html>
 <html>
   <head>
@@ -11,16 +11,78 @@ index_src = """
   <body>
     <hr>
     <h1> Turnbased Game Server </h1>
-    <a href="/new"> New Game </a> -
-    <a href="/list"> List Games </a> -
+    <a href="/games/new"> New Game </a> -
+    <a href="/games/list"> List Games </a> -
     <a href="/docs"> Documentation </a>
     <hr>
   </body>
 </html>
 """
 
+new_game_tmpl = """
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body{ font-family: sans-serif; }
+      td{ padding: 0.25em; }
+      a:visited{ color: blue; }
+    </style>
+    <script>
+      function id(x){ return document.getElementById(x); }
+      function int(x){ return x? parseInt(x) : 0; }
+      function updateMin(){
+        var min = int(id("min_players").value);
+        var max = int(id("max_players").value);
+        if(max < min) id("min_players").value = max;
+      }
+      function updateMax(){
+        var min = int(id("min_players").value);
+        var max = int(id("max_players").value);
+        if(max < min) id("max_players").value = min;
+      }
+    </script>
+  </head>
+  <body>
+    <hr>
+    <form method="POST">
+    <h1> New Game </h1>
+      <table>
+        <tr>
+          <td> Game Type </td>
+          <td>
+            <select name="game_paradigm">
+              %for paradigm in data['paradigms']:
+                <option value="{{paradigm}}"> {{paradigm}} </option>
+              %end
+            </select><br>
+          </td>
+        </tr>
+        <tr>
+          <td>Min Players</td>
+          <td><input name="min_players" id="min_players" onchange="updateMax();"
+                     type="number" min=0 max=255></input></td>
+        </td>
+        <tr>
+          <td>Max Players</td>
+          <td><input name="max_players" id="max_players" onchange="updateMin();"
+                     type="number" min=0 max=255></input></td>
+        </td>
+        <tr>
+          <td></td>
+          <td><input type="submit" value="Create Game"></input></td>
+        </tr>
+      <table>
+    </form>
+    <hr>
+  </body>
+</html>
+"""
 
-doc_src = """
+
+
+
+docs_html = """
 <!doctype html>
 <html>
   <head>
@@ -73,5 +135,6 @@ What the workflow will look like:
   </body>
 </html>
 """
+
 
 
