@@ -50,9 +50,9 @@ def verify(data, move, seat):
     stones = data['stones']
     turn = data['turn']
     take = move['take']
-    assert take ==1 or take==2,    "must take 1 or 2 stones"
+    assert take == 1 or take == 2,    "must take 1 or 2 stones"
     assert take <= stones,         "cannot take " + take + " stones, only " + stones + " remains."
-    assert seat==1 or seat==2,     "only 2 seats allowed"
+    assert seat == 1 or seat == 2,     "only 2 seats allowed"
     assert seat == turn_seat(turn), "not your turn"
     return True
     # print(state, move)

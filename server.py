@@ -1,11 +1,17 @@
 
-from bottle import Bottle, SimpleTemplate, request, response
-import NimHandler as handler
+import sys
 
+# require python 3
+if sys.version_info[0] != 3:
+    raise Exception("Python 3 required.")
+
+from bottle import Bottle, SimpleTemplate, request, response
 import string
 import pickledb
 import random
-import sys
+
+import NimHandler as handler
+import pages
 
 
 DB_FILE = sys.argv[1] if len(sys.argv) > 1 else "turnbased_server.db"
@@ -23,59 +29,13 @@ def gen_cookie():
     return gen_randomstring(COOKIE_LEN)
 
 
-index_src = """
-<!doctype html>
-<html>
-  <head>
-    <style>
-      body{ font-family: sans-serif; }
-      a:visited{ color: blue; }
-    </style>
-  </head>
-  <body>
-    <hr>
-    <h1> Turnbased Game Server </h1>
-    <a href="/new"> New Game </a> -
-    <a href="/list"> List Games </a> -
-    <a href="/docs"> Documentation </a>
-    <hr>
-  </body>
-</html>
-"""
-
-
-doc_src = """
-<!doctype html>
-<html>
-  <head>
-  </head>
-  <body>
-    <h1> Documentation Page </h1>
-    What the workflow will look like:
-    <ol>
-     <li> Automatic Session (with cookies)</li>
-     <li> Make a game or Join a Game
-       <ol>
-         <li> Make a game
-           <ul><li>item</li></ul></li>
-         <li> Join a game
-           <ul><li>item</li></ul></li>
-       </ol>
-     </li>
-     <li> Join as Developer </li>
-    </ol>
-  </body>
-</html>
-"""
-
 def session():
     cookie = request.get_cookie(COOKIE)
-    if cookie:
-        if db.get(COOKIE_KEY + cookie):
-            return cookie
-        else:
-            cookie = None
-        
+
+    # check if cookie is valid
+    if cookie and db.get(COOKIE_KEY + cookie):
+        return cookie
+
     cookie = gen_cookie()
     response.set_cookie(COOKIE, cookie, path='/')
     db.set(COOKIE_KEY + cookie, cookie)
@@ -87,12 +47,11 @@ def session():
 @app.route('/')
 def index():
     cookie = session()
-    return index_src
+    return pages.index_src
     
 @app.route('/docs')
 def docs():
-    return doc_src
-
+    return pages.doc_src
 
 if __name__ == "__main__":
     app.run(debug=True)
