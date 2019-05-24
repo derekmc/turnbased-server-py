@@ -40,20 +40,24 @@ What the workflow will look like:
 
  - Developer Info
 
- - Paradigm Info:
+ - Paradigm Info
     min_players
     max_players
     sequenced_turns --
       Enforce turn sequence.
-      Turns must be sequenced to impose time limits.
+      If turns are sequenced, then time limits are based on the current turn.
+      Otherwise, time limits are based on the player's last turn.
       Once time runs out, a "null" move is sent.
     elo: boolean
 
- - Game Info:
+ - Game Info
     min_players
     max_players
     turn_time --
       time allocated for each move, including first.
+      after turn time expires, your total time starts draining.
+    extra_turn_time --
+      time allocated to the total time pool after each completed move.
     total_time --
       time allocated per player for entire game.
       once the turn time has been used, the total time starts draining.
