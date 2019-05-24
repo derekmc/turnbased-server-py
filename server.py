@@ -53,6 +53,23 @@ def index():
 def docs():
     return pages.doc_src
 
+@app.route('/games/list')
+def games_list():
+    pass
+
+@app.route('/games/new')
+def games_new():
+    pass
+
+@app.route('/game/<id:int>/sit')
+def game_sit(id):
+    return "game sit page goes here."
+
+@app.route('/game/<id:int>/stand')
+def game_stand():
+    pass
+
+
 if __name__ == "__main__":
     app.run(debug=True)
     #app.run(debug=False)

@@ -28,8 +28,14 @@ NimInitSchema = {
     "properties": {
         "stones": {"type": "integer"}}}
 
-def turn_seat(turn, seats=2):
+def __turn_seat(turn, seats=2):
     return (turn - 1)%seats + 1
+
+info = {
+  "name": "Nim",
+  "version" : 'dev',
+  "liveSeating" : False,
+}
 
 
 
@@ -50,10 +56,10 @@ def verify(data, move, seat):
     stones = data['stones']
     turn = data['turn']
     take = move['take']
-    assert take == 1 or take == 2,    "must take 1 or 2 stones"
-    assert take <= stones,         "cannot take " + take + " stones, only " + stones + " remains."
-    assert seat == 1 or seat == 2,     "only 2 seats allowed"
-    assert seat == turn_seat(turn), "not your turn"
+    assert take == 1 or take == 2,  "must take 1 or 2 stones"
+    assert take <= stones,          "cannot take " + take + " stones, only " + stones + " remain(s)."
+    assert seat == 1 or seat == 2,  "only 2 seats allowed"
+    assert seat == __turn_seat(turn), "not your turn"
     return True
     # print(state, move)
 
@@ -69,7 +75,7 @@ def score(data, seat=0):
     stones = data['stones']
     turn = data['turn']
     if stones <= 0:
-        return {'winners': turn_seat(turn), 'finished': True}
+        return {'winners': __turn_seat(turn), 'finished': True}
     return {}
 
 
