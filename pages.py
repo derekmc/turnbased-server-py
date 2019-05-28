@@ -13,7 +13,7 @@ index_html = """
     <h1> Turnbased Game Server </h1>
     <a href="/games/new"> New Game </a> -
     <a href="/games/list"> List Games </a> -
-    <a href="/docs"> Documentation </a>
+    <a href="/docs"> Docs </a>
     <hr>
   </body>
 </html>
