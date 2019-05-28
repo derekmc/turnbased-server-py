@@ -84,6 +84,7 @@ def games_new_page():
     }
     return newgame_template.render(data=data)
 
+# TODO json api vs page navigation.
 @app.route('/games/new', method='POST')
 def games_new_page():
     game_id = game_handler.new_game({})
