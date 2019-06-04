@@ -6,6 +6,7 @@ index_html = dedent("""
     <!doctype html>
     <html>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
           body{ font-family: sans-serif; }
           a:visited{ color: blue; }
@@ -26,6 +27,7 @@ new_game_tmpl = dedent("""
     <!doctype html>
     <html>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
           body{ font-family: sans-serif; }
           td{ padding: 0.25em; }
@@ -111,6 +113,7 @@ new_game_tmpl = dedent("""
 docs_html = dedent("""
     <!doctype html>
     <html>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <head>
       </head>
       <body>

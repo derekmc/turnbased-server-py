@@ -11,6 +11,12 @@ except:
     print("jsonschema not available, no validation will be performed.")
     validate = lambda x,y: True
 
+import NimHandler
+
+handler_list = [NimHandler] 
+handlers = {}
+for handler in handler_list:
+    handlers[handler.info['name']] = handler
 
 # todo factor to config.py
 DATA_FOLDER = 'data'
@@ -57,7 +63,7 @@ def __get_game_db(game_id):
     return db
     
 #TODO schema for settings
-GameSettingsSchema = {
+GameArgsSchema = {
     "type": "object"}
 
   
@@ -66,13 +72,21 @@ GameSettingsSchema = {
 
 # for now, the user token is the users session cookie, but that could be changed to an internal per game identifier, such as player index.
 
-def new_game(settings):
+def new_game(args):
+    paradigm = args['paradigm']
+    try:
+        handler = handlers[name]
+    except KeyError:
+        raise ArgumentError('GameHandler.new_game: paradigm required.')
     game_id = __gen_game_id()
     try:
-        validate(settings, GameSettingsSchema)
+        validate(args, GameArgsSchema)
     except:
         return None
     meta_db.set(GAME_INFO_KEY + game_id, settings)
+    game_db = __get_game_db(game_id)
+    game_db.set
+
     return game_id
 
 def game_move(game_id, user_token, move):

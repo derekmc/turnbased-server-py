@@ -11,7 +11,7 @@ import pickledb
 import random
 
 import NimHandler as handler
-import game_handler
+import GameHandler
 import pages
 
 
@@ -87,7 +87,7 @@ def games_new_page():
 # TODO json api vs page navigation.
 @app.route('/games/new', method='POST')
 def games_new_page():
-    game_id = game_handler.new_game({})
+    game_id = GameHandler.new_game({})
     response.content_type = "application/json"
     if game_id == None:
         return '{ "error": "Invalid settings."}'
