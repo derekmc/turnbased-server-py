@@ -1,2 +1,1 @@
-
- - factor out templates
+dont load pages indirectly through pages.py, just load them in the appropriate server function
