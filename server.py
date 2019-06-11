@@ -5,14 +5,13 @@ import sys, os
 if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
-from bottle import Bottle, SimpleTemplate, request, response
+from bottle import Bottle, request, response, template
 import string
 import pickledb
 import random
 
 import NimHandler as handler
 import GameHandler
-import pages
 
 
 DATA_FOLDER = sys.argv[1] if len(sys.argv) > 1 else 'data'
@@ -62,17 +61,17 @@ def get_session():
 @app.route('/')
 def index():
     cookie = get_session()
-    return pages.index_html
+    return template('templates/index')
     
 @app.route('/docs')
 def docs():
-    return pages.docs_html
+    return template('templates/docs')
 
 @app.route('/games/list')
 def games_list():
     pass
 
-newgame_template = SimpleTemplate(pages.new_game_tmpl)
+#newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/games/new', method='GET')
 def games_new_page():
     data = {
@@ -82,7 +81,7 @@ def games_new_page():
           {"name": "Chinese Chess", "version":"dev", "min_players": 2, "max_players":6 },
         ],
     }
-    return newgame_template.render(data=data)
+    return template('templates/new_game', data=data)
 
 # TODO json api vs page navigation.
 @app.route('/games/new', method='POST')
