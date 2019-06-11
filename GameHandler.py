@@ -73,17 +73,19 @@ GameArgsSchema = {
 # for now, the user token is the users session cookie, but that could be changed to an internal per game identifier, such as player index.
 
 def new_game(args):
+    print(args)
     paradigm = args['paradigm']
     try:
-        handler = handlers[name]
+        handler = handlers[paradigm]
     except KeyError:
         raise ArgumentError('GameHandler.new_game: paradigm required.')
     game_id = __gen_game_id()
+    """
     try:
         validate(args, GameArgsSchema)
     except:
-        return None
-    meta_db.set(GAME_INFO_KEY + game_id, settings)
+        return None"""
+    meta_db.set(GAME_INFO_KEY + game_id, args)
     game_db = __get_game_db(game_id)
     game_db.set
 

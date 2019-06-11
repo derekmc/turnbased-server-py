@@ -91,7 +91,10 @@ def games_new_page():
 # TODO json api vs page navigation.
 @app.route('/games/new', method='POST')
 def games_new_page():
-    game_id = GameHandler.new_game({})
+    game_args = {
+        'paradigm': request.forms.get('game_paradigm'),
+    }
+    game_id = GameHandler.new_game(game_args)
     response.content_type = "application/json"
     if game_id == None:
         return '{ "error": "Invalid settings."}'
