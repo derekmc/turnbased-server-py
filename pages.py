@@ -148,6 +148,3 @@ What the workflow will look like:
   </body>
 </html>
 """
-
-
-

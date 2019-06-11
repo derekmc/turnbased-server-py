@@ -11,12 +11,12 @@ import pickledb
 import random
 
 import NimHandler as handler
-import game_handler as game
+import GameHandler
 import pages
 
 
 DATA_FOLDER = sys.argv[1] if len(sys.argv) > 1 else 'data'
-DB_FILE = "turnbased_server.db"
+DB_FILE = "server_data.db"
 COOKIE = "SESSION_ID"
 COOKIE_KEY = "cookie|"
 COOKIE_LEN = 8 
@@ -25,6 +25,7 @@ COOKIE_TRIES = 6
 
 if not os.path.exists(DATA_FOLDER):
     os.makedirs(DATA_FOLDER)
+
 db = pickledb.load(DATA_FOLDER + "/" + DB_FILE, True)
 app = Bottle()
 
@@ -83,23 +84,26 @@ def games_new_page():
     }
     return newgame_template.render(data=data)
 
+# TODO json api vs page navigation.
 @app.route('/games/new', method='POST')
 def games_new_page():
-    s = " TODO create new game<br>"
-    for key in request.forms:
-        s += key + ": " + request.forms[key] + "<br>"
-    return s
+    game_id = GameHandler.new_game({})
+    response.content_type = "application/json"
+    if game_id == None:
+        return '{ "error": "Invalid settings."}'
+    else:
+        return '{ "game_id" : "%s" }' % (game_id,)
     #return "new game post handler"
 
-@app.route('/game/<id:int>/sit')
+@app.route('/game/<id:re:[a-z]*>/sit')
 def game_sit(id):
     return "game sit page goes here."
 
-@app.route('/game/<id:int>/stand')
+@app.route('/game/<id:re:[a-z]*>/stand')
 def game_stand():
     pass
 
-@app.route('/game/<id:int>/move')
+@app.route('/game/<id:re:[a-z]*>/move')
 def game_move():
     cookie = get_session()
     pass
