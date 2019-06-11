@@ -8,17 +8,22 @@
 Documentation Page
 =========================
 
-What the workflow will look like:
+Paradigm Functions
+ seat 0 is the public view
 
- - Automatic Session (with cookies)
+ - init(init_args)
+    - game_data: {}
+ - verify(game_data, move, seat)
+    - is_move_valid: true/false
+ - update(game_data, move, seat)
+    - game_data: {}
+ - view(game_data, seat)
+    - game_view: {}
+ - score(data, seat=0)
+    - {is_finished, winners, seat_ranks, seat_scores}
 
- - Make a game or Join a Game
-    Make a game
-    Join a game
 
- - Developer Info
-
- - Paradigm Info
+Paradigm Info
     min_players
     max_players
     sequenced_turns --
@@ -47,6 +52,23 @@ What the workflow will look like:
       unranked -- dont compute elo
       min_elo
       max_elo
+
+Paradigm Properties
+ - info
+  - min_players
+  - max_players
+
+
+What the workflow will look like:
+
+ - Automatic Session (with cookies)
+
+ - Make a game or Join a Game
+    Make a game
+    Join a game
+
+ - Developer Info
+
     </pre>
   </body>
 </html>
