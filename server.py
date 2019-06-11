@@ -32,6 +32,9 @@ app = Bottle()
 # TODO list paradigms
 
 
+def read_file(name):
+    return open(name).read()
+
 def gen_randomstring(n):
     return ''.join(random.choice(string.ascii_letters) for x in range(n))
 
@@ -63,9 +66,11 @@ def index():
     cookie = get_session()
     return template('templates/index')
     
+docs_html = read_file('static/docs.html')
+
 @app.route('/docs')
 def docs():
-    return template('templates/docs')
+    return docs_html
 
 @app.route('/games/list')
 def games_list():
