@@ -1,7 +1,7 @@
 
 from json import loads
 import unittest
-import NimHandler as handler
+import games.nim as handler
 
 GameScoreSchema = {
     "type": "object"

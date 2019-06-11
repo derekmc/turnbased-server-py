@@ -11,7 +11,7 @@ except:
     print("jsonschema not available, no validation will be performed.")
     validate = lambda x,y: True
 
-import NimHandler
+import games.nim as NimHandler
 
 handler_list = [NimHandler] 
 handlers = {}

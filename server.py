@@ -10,7 +10,7 @@ import string
 import pickledb
 import random
 
-import NimHandler as handler
+import games.nim as handler
 import GameHandler
 
 
