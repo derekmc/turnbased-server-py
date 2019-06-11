@@ -1,1 +1,3 @@
-update docs with paradigm functions and descriptions
+lobby page.
+debug list games
+mygames page

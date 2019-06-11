@@ -74,7 +74,9 @@ def docs():
 
 @app.route('/games/list')
 def games_list():
-    pass
+    game_list = GameHandler.list_games()
+    print('game_list', game_list)
+    return template('templates/list_games', game_list=game_list)
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/games/new', method='GET')
@@ -105,6 +107,10 @@ def games_new_page():
 @app.route('/game/<id:re:[a-z]*>/sit')
 def game_sit(id):
     return "game sit page goes here."
+
+@app.route('/game/<id:re:[a-z]*>/lobby')
+def game_lobby(id):
+    pass
 
 @app.route('/game/<id:re:[a-z]*>/stand')
 def game_stand():
