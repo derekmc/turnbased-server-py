@@ -9,6 +9,7 @@ from bottle import Bottle, request, response, template, abort
 import string
 import pickledb
 import random
+import json
 
 import games.nim as handler
 import GameHandler
@@ -75,12 +76,11 @@ def docs():
 @app.route('/list')
 def games_list():
     game_list = GameHandler.list_games()
-    print('game_list', game_list)
-    return template('templates/list_games', game_list=game_list)
+    return template('templates/list_games', game_list=json.dumps(game_list))
 
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
-@app.route('/games/new', method='GET')
+@app.route('/new', method='GET')
 def games_new_page():
     data = {
         "paradigms" : [
@@ -92,17 +92,16 @@ def games_new_page():
     return template('templates/new_game', data=data)
 
 # TODO json api vs page navigation.
-@app.route('/games/new', method='POST')
+@app.route('/new', method='POST')
 def games_new_page():
     game_args = {
         'paradigm': request.forms.get('game_paradigm'),
     }
     game_id = GameHandler.new_game(game_args)
-    response.content_type = "application/json"
     if game_id == None:
-        return '{ "error": "Invalid settings."}'
+        abort(404, "Cannot create new game.")
     else:
-        return '{ "game_id" : "%s" }' % (game_id,)
+        return template('templates/new_redirect', game_id=game_id)
     #return "new game post handler"
 
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby')

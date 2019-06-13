@@ -3,17 +3,23 @@
   <head>
     <style>
       body{ font-family: sans-serif; }
-      td{ padding: 0.25em; }
+      td{
+        padding: 0.25em;
+        text-align: center; }
+      tr:nth-child(even){
+         background: #d0e8ff; }
+      th{ background: #014; color: #fff; padding: 0.8em; font-weight: normal; }
+      table{
+        border-spacing: 0; }
       a:visited{ color: blue; }
     </style>
     <script>
       window.onload = function(){
-        alert('here');
+        render_list(document.getElementById("main"), game_list);
       }
-      var game_list = {{game_list}};
+      var game_list = {{!game_list}};
       //alert(game_list)
       //document.write(JSON.stringify(game_list));
-      render_list(document.body, game_list);
       function elem(container, tag, props){
         var el = document.createElement(tag);
         for(var k in props){
@@ -31,29 +37,26 @@
         return el;
       }
       function render_list(container, list){
+        console.log('render_list', list);
         var table = elem(container, 'table');
         var tr = elem(table, 'tr');
         elem(tr, 'th', {text: 'Game Id'});
-        elem(tr, 'th', {text: 'Game Type'});
+        elem(tr, 'th', {text: 'Type'});
+        elem(tr, 'th', {text: 'Allowed Players'});
         for(var i=0; i<list.length; ++i){
           var game = list[i];
           var tr = elem(table, 'tr');
-          elem(tr, 'td', {text: game.id});
-          elem(tr, 'td', {text: game.paradigm}); }
+          elem(elem(tr, 'td'), 'a', {href: '/game/' + game.id + '/lobby', text: game.id});
+          elem(tr, 'td', {text: game.paradigm});
+          elem(tr, 'td', {text: game.min_players + " - " + game.max_players});
+        }
       }
     </script>
   </head>
   <body>
     <hr>
     <h1> List Games </h1>
-    <table>
-      <tr>
-        <th> Game Type </th>
-        <th> Sit </th>
-        <th> Spectate </th>
-      </tr>
-    <table>
-    {{game_list}}
+    <div id="main"></div>
     <hr>
   </body>
 </html>

@@ -4,6 +4,7 @@ import pickledb
 import os
 import random
 import string
+import copy
 
 try:
     from jsonschema import validate
@@ -79,7 +80,6 @@ GameArgsSchema = {
 # for now, the user token is the users session cookie, but that could be changed to an internal per game identifier, such as player index.
 
 def new_game(args):
-    print(args)
     paradigm = args['paradigm']
     try:
         handler = handlers[paradigm]
@@ -92,7 +92,9 @@ def new_game(args):
     except:
         return None"""
     game_list = default([], meta_db.get(GAME_LIST_KEY))
-    game_list_entry = {'id': game_id, 'paradigm': paradigm}
+    game_list_entry = copy.deepcopy(args)
+    game_list_entry['id'] = game_id
+    game_list_entry['paradigm'] = paradigm
     game_list.append(game_list_entry)
     meta_db.set(GAME_INFO_KEY + game_id, args)
     meta_db.set(GAME_LIST_KEY, game_list)
