@@ -5,7 +5,7 @@ import sys, os
 if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
-from bottle import Bottle, request, response, template
+from bottle import Bottle, request, response, template, abort
 import string
 import pickledb
 import random
@@ -72,11 +72,12 @@ docs_html = read_file('static/docs.html')
 def docs():
     return docs_html
 
-@app.route('/games/list')
+@app.route('/list')
 def games_list():
     game_list = GameHandler.list_games()
     print('game_list', game_list)
     return template('templates/list_games', game_list=game_list)
+
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/games/new', method='GET')
@@ -104,19 +105,24 @@ def games_new_page():
         return '{ "game_id" : "%s" }' % (game_id,)
     #return "new game post handler"
 
-@app.route('/game/<id:re:[a-z]*>/sit')
+@app.route('/game/<id:re:[a-zA-Z]*>/lobby')
+def game_lobby(id):
+    info = GameHandler.game_info(id)
+    if info == None:
+        abort(404, "Unknown game id.")
+    return template('templates/lobby', game_id=id, info=info)
+
+
+@app.route('/game/<id:re:[a-zA-Z]*>/sit')
 def game_sit(id):
     return "game sit page goes here."
 
-@app.route('/game/<id:re:[a-z]*>/lobby')
-def game_lobby(id):
-    pass
 
-@app.route('/game/<id:re:[a-z]*>/stand')
+@app.route('/game/<id:re:[a-zA-Z]*>/stand')
 def game_stand():
     pass
 
-@app.route('/game/<id:re:[a-z]*>/move')
+@app.route('/game/<id:re:[a-zA-Z]*>/move')
 def game_move():
     cookie = get_session()
     pass
