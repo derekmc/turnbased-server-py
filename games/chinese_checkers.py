@@ -3,6 +3,10 @@ info = {
     "name": "Chinese Checkers",
     "version": "dev",
     "liveSeating": False,
+# TODO make sure turns go around the board counter clockwise, instead of in 
+    "turn_sequence": [1, 4, 5, 2, 3, 6]
+    "min_players": 2,
+    "max_players": 6,
 }
 
 # visual board layout
@@ -26,8 +30,6 @@ info = {
              2
 """
 
-# TODO make sure turns go around the board counter clockwise, instead of in 
-__player_order = [1, 4, 5, 2, 3, 6]
 
 
 # dashes represent squares that can't be filled.

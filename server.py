@@ -96,6 +96,8 @@ def games_new_page():
 def games_new_page():
     game_args = {
         'paradigm': request.forms.get('game_paradigm'),
+        'min_players': request.forms.get('min_players'),
+        'max_players': request.forms.get('max_players'),
     }
     game_id = GameHandler.new_game(game_args)
     if game_id == None:

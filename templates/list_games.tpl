@@ -45,10 +45,13 @@
         elem(tr, 'th', {text: 'Allowed Players'});
         for(var i=0; i<list.length; ++i){
           var game = list[i];
+          var min_players = game.min_players;
+          var max_players = game.max_players;
+         
           var tr = elem(table, 'tr');
           elem(elem(tr, 'td'), 'a', {href: '/game/' + game.id + '/lobby', text: game.id});
           elem(tr, 'td', {text: game.paradigm});
-          elem(tr, 'td', {text: game.min_players + " - " + game.max_players});
+          elem(tr, 'td', {text: min_players == max_players? min_players : min_players + " - " + max_players});
         }
       }
     </script>
