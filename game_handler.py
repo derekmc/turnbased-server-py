@@ -12,12 +12,11 @@ except:
     print("jsonschema not available, no validation will be performed.")
     validate = lambda x,y: True
 
-import games.nim as NimHandler
+import games
 
-handler_list = [NimHandler] 
-handlers = {}
-for handler in handler_list:
-    handlers[handler.info['name']] = handler
+game_handlers = {}
+for game in games:
+    game_handlers[game.info['name']] = game
 
 def default(_default, value):
     if value == None or value == False:
@@ -82,9 +81,9 @@ GameArgsSchema = {
 def new_game(args):
     paradigm = args['paradigm']
     try:
-        handler = handlers[paradigm]
+        handler = game_handlers[paradigm]
     except KeyError:
-        raise ArgumentError('GameHandler.new_game: paradigm required.')
+        raise ArgumentError('game_handler.new_game: paradigm required.')
     game_id = __gen_game_id()
     """
     try:

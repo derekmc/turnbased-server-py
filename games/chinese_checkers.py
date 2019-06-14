@@ -4,7 +4,7 @@ info = {
     "version": "dev",
     "liveSeating": False,
 # TODO make sure turns go around the board counter clockwise, instead of in 
-    "turn_sequence": [1, 4, 5, 2, 3, 6]
+    "turn_sequence": [1, 4, 5, 2, 3, 6],
     "min_players": 2,
     "max_players": 6,
 }
@@ -177,7 +177,7 @@ def init(init_args):
     for i in range(player_count + 1, 6):
         board_str = board_str.replace
     data = {
-        'player_count' : player_count
+        'player_count' : player_count,
         'board' : start_board_str,
     }
     return data

@@ -12,7 +12,13 @@ import random
 import json
 
 import games.nim as handler
-import GameHandler
+import game_handler
+import games
+
+game_paradigms
+
+for game in games:
+	game_paradigms.append(game.info)
 
 
 DATA_FOLDER = sys.argv[1] if len(sys.argv) > 1 else 'data'
@@ -75,7 +81,7 @@ def docs():
 
 @app.route('/list')
 def games_list():
-    game_list = GameHandler.list_games()
+    game_list = game_handler.list_games()
     return template('templates/list_games', game_list=json.dumps(game_list))
 
 
@@ -86,7 +92,7 @@ def games_new_page():
         "paradigms" : [
           {"name": "Nim", "version":"dev", "min_players": 2, "max_players":2 },
           {"name": "Chess", "version":"dev", "min_players": 2, "max_players":2 },
-          {"name": "Chinese Chess", "version":"dev", "min_players": 2, "max_players":6 },
+          {"name": "Chinese Checkers", "version":"dev", "min_players": 2, "max_players":6 },
         ],
     }
     return template('templates/new_game', data=data)
@@ -99,7 +105,7 @@ def games_new_page():
         'min_players': request.forms.get('min_players'),
         'max_players': request.forms.get('max_players'),
     }
-    game_id = GameHandler.new_game(game_args)
+    game_id = game_handler.new_game(game_args)
     if game_id == None:
         abort(404, "Cannot create new game.")
     else:
@@ -108,7 +114,7 @@ def games_new_page():
 
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby')
 def game_lobby(id):
-    info = GameHandler.game_info(id)
+    info = game_handler.game_info(id)
     if info == None:
         abort(404, "Unknown game id.")
     return template('templates/lobby', game_id=id, info=info)
