@@ -80,10 +80,13 @@ GameArgsSchema = {
 
 def new_game(args):
     paradigm = args['paradigm']
+    if paradigm == None:
+        print(args)
+        raise ValueError('game_handler.new_game no paradigm attribute')
     try:
         handler = game_handlers[paradigm]
     except KeyError:
-        raise ArgumentError('game_handler.new_game: paradigm required.')
+        raise ValueError('game_handler.new_game unknown game paradigm: ' + paradigm) 
     game_id = __gen_game_id()
     """
     try:

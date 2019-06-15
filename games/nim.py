@@ -34,7 +34,9 @@ def __turn_seat(turn, seats=2):
 info = {
   "name": "Nim",
   "version" : 'dev',
-  "liveSeating" : False,
+  "live_seating" : False,
+  "min_players": 2,
+  "max_players": 2,
 }
 
 

@@ -43,7 +43,7 @@
         var tr = elem(table, 'tr');
         elem(tr, 'th', {text: 'Game Id'});
         elem(tr, 'th', {text: 'Type'});
-        elem(tr, 'th', {text: 'Allowed Players'});
+        elem(tr, 'th', {text: 'Players'});
         for(var i=0; i<list.length; ++i){
           var game = list[i];
           var min_players = game.min_players;

@@ -2,7 +2,7 @@
 info = {
     "name": "Chinese Checkers",
     "version": "dev",
-    "liveSeating": False,
+    "live_seating": False,
 # TODO make sure turns go around the board counter clockwise, instead of in 
     "turn_sequence": [1, 4, 5, 2, 3, 6],
     "min_players": 2,

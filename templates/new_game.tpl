@@ -22,7 +22,8 @@
         if(max < min) id("max_players").value = min;
       }
       % import json
-      var paradigm_list = {{! data['paradigms']}}
+      var paradigm_list = {{! json.dumps(data['paradigms'])}}
+      // alert(JSON.stringify(paradigm_list));
       var paradigms = {};
       for(var i=0; i<paradigm_list.length; ++i){
           var paradigm = paradigm_list[i];
