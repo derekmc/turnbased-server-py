@@ -12,7 +12,7 @@ except:
     print("jsonschema not available, no validation will be performed.")
     validate = lambda x,y: True
 
-import games
+from games import games
 
 game_handlers = {}
 for game in games:

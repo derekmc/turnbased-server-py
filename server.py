@@ -13,9 +13,9 @@ import json
 
 import games.nim as handler
 import game_handler
-import games
+from games import games
 
-game_paradigms
+game_paradigms = []
 
 for game in games:
 	game_paradigms.append(game.info)
@@ -89,11 +89,7 @@ def games_list():
 @app.route('/new', method='GET')
 def games_new_page():
     data = {
-        "paradigms" : [
-          {"name": "Nim", "version":"dev", "min_players": 2, "max_players":2 },
-          {"name": "Chess", "version":"dev", "min_players": 2, "max_players":2 },
-          {"name": "Chinese Checkers", "version":"dev", "min_players": 2, "max_players":6 },
-        ],
+        "paradigms" : game_paradigms
     }
     return template('templates/new_game', data=data)
 
