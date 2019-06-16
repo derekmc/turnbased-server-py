@@ -5,7 +5,8 @@ import sys, os
 if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
-from bottle import Bottle, request, response, template, abort
+from bottle import Bottle, request, response, template, abort, \
+                   static_file, BaseTemplate
 import string
 import pickledb
 import random
@@ -22,6 +23,7 @@ for game in games:
 
 
 DATA_FOLDER = sys.argv[1] if len(sys.argv) > 1 else 'data'
+NAV_TEMPLATE_FILE = "templates/nav.html.tpl"
 DB_FILE = "server_data.db"
 COOKIE = "SESSION_ID"
 COOKIE_KEY = "cookie|"
@@ -40,8 +42,14 @@ app = Bottle()
 
 
 def read_file(name):
-    return open(name).read()
+    _f = open(name)
+    result = _f.read()
+    _f.close()
+    return result
 
+nav_html_contents = read_file(NAV_TEMPLATE_FILE)
+
+BaseTemplate.defaults['nav_header'] = nav_html_contents
 def gen_randomstring(n):
     return ''.join(random.choice(string.ascii_letters) for x in range(n))
 
@@ -72,12 +80,11 @@ def get_session():
 def index():
     cookie = get_session()
     return template('templates/index')
-    
-docs_html = read_file('static/docs.html')
 
-@app.route('/docs')
-def docs():
-    return docs_html
+
+@app.route('/static/<filepath:re:.*>', method="GET")
+def static_resource(filepath):
+    return static_file(filepath, root="static")
 
 @app.route('/list')
 def games_list():

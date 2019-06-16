@@ -1,19 +1,8 @@
 <!doctype html>
 <html>
   <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body{ font-family: sans-serif; }
-      td{
-        padding: 0.25em;
-        text-align: center; }
-      tr:nth-child(even){
-         background: #d0e8ff; }
-      th{ background: #014; color: #fff; padding: 0.8em; font-weight: normal; }
-      table{
-        border-spacing: 0; }
-      a:visited{ color: blue; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="static/basic.css">
     <script>
       window.onload = function(){
         render_list(document.getElementById("main"), game_list);
@@ -58,6 +47,7 @@
     </script>
   </head>
   <body>
+    {{! nav_header }}
     <hr>
     <h1> List Games </h1>
     <div id="main"></div>

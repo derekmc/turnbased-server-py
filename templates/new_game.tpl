@@ -2,11 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body{ font-family: sans-serif; }
-      td{ padding: 0.25em; }
-      a:visited{ color: blue; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="static/basic.css">
     <script>
       window.addEventListener("load", init);
       function id(x){ return document.getElementById(x); }
@@ -47,6 +43,7 @@
     </script>
   </head>
   <body>
+    {{! nav_header }}
     <hr>
     <form method="POST">
     <h1> New Game </h1>
@@ -72,8 +69,7 @@
                      type="number" min=0 max=255></input></td>
         </td>
         <tr>
-          <td></td>
-          <td><input type="submit" value="Create Game"></input></td>
+          <td colspan=2><input type="submit" value="Create Game"></input></td>
         </tr>
       <table>
     </form>
