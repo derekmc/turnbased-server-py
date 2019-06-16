@@ -44,7 +44,6 @@
   </head>
   <body>
     {{! nav_header }}
-    <hr>
     <form method="POST">
     <h1> New Game </h1>
       <table>
@@ -73,6 +72,5 @@
         </tr>
       <table>
     </form>
-    <hr>
   </body>
 </html>

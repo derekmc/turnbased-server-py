@@ -7,8 +7,6 @@
   </head>
   <body>
     {{! nav_header }}
-    <hr>
     <h1> Turnbased Game Server </h1>
-    <hr>
   </body>
 </html>

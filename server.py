@@ -124,6 +124,7 @@ def games_new_page():
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby')
 def game_lobby(id):
     info = game_handler.game_info(id)
+    print('game', info);
     if info == None:
         abort(404, "Unknown game id.")
     return template('templates/lobby', game_id=id, info=info)

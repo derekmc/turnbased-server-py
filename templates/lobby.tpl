@@ -11,20 +11,21 @@
   </head>
   <body>
     {{! nav_header }}
-    <hr>
-    <h1> Game Lobby "{{ game_id }}" </h1>
+    <h1> Game Lobby "{{ game_id }}"</h1>
+    Game Type - <i>{{info['paradigm']}}</i> <br><br>
     <form>
       <table style="min-width: 240px;">
-        <tr><th> Seat </th> <th> Join </th></tr>
-        <tr><td> 1 </td> <td> Filled </tr>
-        <tr><td> 2 </td> <td><button> Sit </button><td></tr>
-        <tr><td> 3 </td> <td> Empty </td></tr>
+        <tr><th> Seat </th> <th> Player </th></tr>
+        <tr><td> 1 </td> <td> Player 1 </td></tr>
+        <tr><td> 2 </td> <td><button disabled > Sit </button></td></tr>
+        <tr><td> 3 </td> <td> - </td></tr>
+        <tr><td> 4 </td> <td><button> Stand </button></td></tr>
         <!--tr><td colspan=2><button> Take Next Seat </button> <button> Enter Game</button></td></tr-->
       </table>
       <br>
       <button> Take Next Seat </button>
       <button> Enter Game </button>
-      <hr>
+      <button disabled> Spectate Game </button>
     </form>
     
   </body>

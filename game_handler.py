@@ -57,7 +57,8 @@ def __gen_randomstring(n):
 
 def __gen_game_id():
     for i in range(GEN_ID_TRIES):
-        id = __gen_randomstring(ID_LEN)
+        #game ids should uniquely be all upper case to be less ambiguous
+        id = __gen_randomstring(ID_LEN).upper()
         if not meta_db.get(GAME_INFO_KEY + id):
             return id
     raise Exception("Could not find available id")

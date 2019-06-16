@@ -11,8 +11,6 @@
     </style>
   </head>
   <body>
-    <hr>
      <a href="/game/{{game_id}}/lobby"> Game "{{game_id}}"</a>
-    <hr>
   </body>
 </html>

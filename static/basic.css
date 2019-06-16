@@ -8,8 +8,10 @@ th{ background: #014; color: #fff; padding: 0.8em; font-weight: normal; }
 table{
   border-spacing: 0; }
 
+h1 { text-transform: uppercase; }
 
 .nav a{ text-decoration: none; margin-right: 1em; color: #00c; font-weight: bold; }
 .nav a:visited{ color: #00c; }
 a:visited{ color: blue; }
+input[type=submit], button{ font-variant: small-caps; font-family: monospace; font-weight: bold; }
 

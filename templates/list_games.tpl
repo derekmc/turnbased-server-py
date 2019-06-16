@@ -48,9 +48,7 @@
   </head>
   <body>
     {{! nav_header }}
-    <hr>
     <h1> List Games </h1>
     <div id="main"></div>
-    <hr>
   </body>
 </html>
