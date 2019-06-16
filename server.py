@@ -91,6 +91,12 @@ def games_list():
     game_list = game_handler.list_games()
     return template('templates/list_games', game_list=json.dumps(game_list))
 
+@app.route('/mygames')
+def my_games():
+    #todo handler.my_games()
+    game_list = game_handler.list_games()
+    return template('templates/my_games', game_list=json.dumps(game_list))
+
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/new', method='GET')
