@@ -7,13 +7,18 @@
       var game_id = "{{ game_id }}"
       function init(){
       }
+      function sit(seat){
+        var my_seat_input = document.getElementById('my_seat');
+        my_seat_input.value = seat;
+      }
     </script>
   </head>
   <body>
     {{! nav_header }}
     <h1> Game Lobby "{{ game_id }}"</h1>
     Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
-    <form>
+    <form method="POST">
+      <input id="my_seat" name="my_seat" type="hidden" value="{{my_seat}}"/>
       <table style="min-width: 240px;">
         <tr><th> Seat </th> <th> Player </th></tr>
         %for i in range(int(info['max_players'])):
@@ -32,7 +37,7 @@
               %elif i+1 in seats:
                 Player {{i+1}}
               %elif my_seat == 0 and info.get('choose_seats',True):
-                <button> Sit </button>
+                <input type="submit" onclick="sit({{i+1}})" value="Sit"> </input>
               %else:
                 -
               %end

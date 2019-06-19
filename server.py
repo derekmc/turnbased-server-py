@@ -122,11 +122,14 @@ def games_new_page():
         return template('templates/new_redirect', game_id=game_id)
     #return "new game post handler"
 
-@app.route('/game/<id:re:[a-zA-Z]*>/lobby')
+@app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="GET")
+@app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="POST")
 def game_lobby(id):
     cookie = get_session()
     user_token = cookie
     info = game_handler.game_info(id)
+    if request.method == "POST":
+        game_handler.game_sit(id, user_token, request.forms.get("seat"))
     print('game', info);
     if info == None:
         abort(404, "Unknown game id.")
