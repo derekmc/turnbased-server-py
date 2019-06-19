@@ -144,7 +144,7 @@ def game_sit(game_id, user_token, seat):
     if seat in seats:
         return False
     seats[seat] = user_token
-    game_db.save(SEATS_KEY, seats)
+    game_db.set(SEATS_KEY, seats)
     game_db.dump()
 
 # 0 if they are not in this game.
