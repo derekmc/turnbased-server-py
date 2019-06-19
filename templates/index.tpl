@@ -8,5 +8,8 @@
   <body>
     {{! nav_header }}
     <h1> Turnbased Game Server </h1>
+    <a href="/new">New Game</a><br><br>
+    <a href="/list">List Games</a><br><br>
+    <a href="/mygames">My Games</a><br><br>
   </body>
 </html>

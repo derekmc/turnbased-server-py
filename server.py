@@ -113,6 +113,7 @@ def games_new_page():
         'paradigm': request.forms.get('game_paradigm'),
         'min_players': request.forms.get('min_players'),
         'max_players': request.forms.get('max_players'),
+        'choose_seats': request.forms.get('choose_seats'),
     }
     game_id = game_handler.new_game(game_args)
     if game_id == None:

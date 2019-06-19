@@ -68,6 +68,11 @@
                      type="number" min=0 max=255></input></td>
         </td>
         <tr>
+          <td colspan=2>
+            <label for="choose_seats">Choose Seats</label>
+            <input type="checkbox" name="choose_seats" id="choose_seats"></input>
+          </td>
+        <tr>
           <td colspan=2><input type="submit" value="Create Game"></input></td>
         </tr>
       <table>

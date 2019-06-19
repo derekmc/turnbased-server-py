@@ -31,7 +31,7 @@
                 <button> Stand </button>
               %elif i+1 in seats:
                 Player {{i+1}}
-              %elif my_seat == 0:
+              %elif my_seat == 0 and info.get('choose_seats',True):
                 <button> Sit </button>
               %else:
                 -
@@ -39,6 +39,15 @@
             </td>
           </tr>
         %end
+        %if not info.get('choose_seats',True) and my_seat == 0:
+          <tr><td colspan=2><button> Take Next Seat </button></td></tr>
+        %end
+        <tr>
+          <td colspan=2>
+            <button> Enter Game </button>
+            <button disabled> Spectate Game </button>
+          </td>
+        </tr>
         <!--
         <tr><td> 1 </td> <td> Player 1 </td></tr>
         <tr><td> 2 </td> <td><button disabled > Sit </button></td></tr>
@@ -47,9 +56,6 @@
         <tr><td colspan=2><button> Take Next Seat </button> <button> Enter Game</button></td></tr-->
       </table>
       <br>
-      <button> Take Next Seat </button>
-      <button> Enter Game </button>
-      <button disabled> Spectate Game </button>
     </form>
     
   </body>
