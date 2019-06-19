@@ -37,7 +37,7 @@ GAME_INFO_KEY = 'game_info|'
 GAME_LIST_KEY = '|game_list|'
 
 # per game keys
-SEATS_KEY = 'player_seats|'
+SEATS_KEY = '|player_seats|'
 STATE_KEY = '|game_state|'
 SCORE_KEY = '|game_score|'
 
@@ -110,24 +110,49 @@ def new_game(args):
 def list_games():
     return default([], meta_db.get(GAME_LIST_KEY))
 
+
+
 def game_info(game_id):
     return default(None, meta_db.get(GAME_INFO_KEY + game_id))
 
 def game_move(game_id, user_token, move):
-    game_db = __game_db(game_id)
+    game_db = __get_game_db(game_id)
     pass
 
+def game_list_seats(game_id):
+    game_db = __get_game_db(game_id)
+    seats = default({}, game_db.get(SEATS_KEY))
+    # hide user tokens
+    numbered_seats = {}
+    for seat in seats:
+        numbered_seats[seat]
+    return numbered_seats
+
+def game_get_seat(game_id, user_token):
+    game_db = __get_game_db(game_id)
+    seats = default({}, game_db.get(SEATS_KEY))
+    for seat in seats:
+        if seats[seat] == user_token:
+            return seat
+    # 0 is public seat view
+    return 0
+
+
 def game_sit(game_id, user_token, seat):
-    game_db = __game_db(game_id)
-    db = pickledb.load()
-    pass
+    game_db = __get_game_db(game_id)
+    seats = default({}, game_db.get(SEATS_KEY))
+    if seat in seats:
+        return False
+    seats[seat] = user_token
+    game_db.save(SEATS_KEY, seats)
+    game_db.dump()
 
 # 0 if they are not in this game.
 def game_seat(game_id, user_token):
-    game_db = __game_db(game_id)
+    game_db = __get_game_db(game_id)
     pass
 
 def game_stand(game_id, user_token):
-    game_db = __game_db(game_id)
+    game_db = __get_game_db(game_id)
     pass
 

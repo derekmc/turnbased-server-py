@@ -123,11 +123,15 @@ def games_new_page():
 
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby')
 def game_lobby(id):
+    cookie = get_session()
+    user_token = cookie
     info = game_handler.game_info(id)
     print('game', info);
     if info == None:
         abort(404, "Unknown game id.")
-    return template('templates/lobby', game_id=id, info=info)
+    seats = game_handler.game_list_seats(id)
+    my_seat = game_handler.game_get_seat(id, user_token)
+    return template('templates/lobby', game_id=id, info=info, seats=seats, my_seat=my_seat)
 
 
 @app.route('/game/<id:re:[a-zA-Z]*>/sit')
