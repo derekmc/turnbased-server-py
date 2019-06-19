@@ -44,8 +44,13 @@
         %end
         <tr>
           <td colspan=2>
-            <button> Enter Game </button>
-            <button disabled> Spectate Game </button>
+            %if my_seat == 0:
+              <button disabled> Enter Game </button>
+              <button> Spectate Game </button>
+            %else:
+              <button> Enter Game </button>
+              <button disabled> Spectate Game </button>
+            %end
           </td>
         </tr>
         <!--

@@ -15,11 +15,15 @@ table{
 
 h1 { text-transform: uppercase; }
 
+a:visited{ color: blue; }
+
 .nav { position: absolute; display: block;
        top: 0; left: 0; right: 0;
        margin: 0; padding: 10px 18px; background: black; }
 .nav a{ font-size: 88%; text-decoration: none; margin-right: 1em; color: #fff; font-weight: normal; }
 .nav a:visited{ color: #fff; }
-a:visited{ color: blue; }
-input[type=submit], button{ font-variant: small-caps; font-family: monospace; font-weight: bold; }
+
+input[type=submit], button{
+    font-size:116%; text-transform: uppercase;
+    font-family: monospace; font-weight: bold; }
 
