@@ -5,11 +5,12 @@
     <link rel="stylesheet" type="text/css" href="/static/basic.css">
     <script>
       var game_id = "{{ game_id }}"
+      var my_seat = "{{ my_seat }}"
       function init(){
       }
       function sit(seat){
-        var my_seat_input = document.getElementById('my_seat');
-        my_seat_input.value = seat;
+        var sit_index_input = document.getElementById('sit_index');
+        sit_index_input.value = seat;
       }
     </script>
   </head>
@@ -18,7 +19,7 @@
     <h1> Game Lobby "{{ game_id }}"</h1>
     Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
     <form method="POST">
-      <input id="my_seat" name="my_seat" type="hidden" value="{{my_seat}}"/>
+      <input id="sit_index" name="sit_index" type="hidden" value="0"/>
       <table style="min-width: 240px;">
         <tr><th> Seat </th> <th> Player </th></tr>
         %for i in range(int(info['max_players'])):
@@ -32,7 +33,7 @@
               %end
             </td>
             <td>
-              %if my_seat == i+1:
+              %if int(my_seat) == i+1:
                 <button> Stand </button>
               %elif i+1 in seats:
                 Player {{i+1}}

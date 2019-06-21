@@ -6,7 +6,7 @@ if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
 from bottle import Bottle, request, response, template, abort, \
-                   static_file, BaseTemplate
+                   static_file, BaseTemplate, redirect
 import string
 import pickledb
 import random
@@ -119,8 +119,7 @@ def games_new_page():
     if game_id == None:
         abort(404, "Cannot create new game.")
     else:
-        return template('templates/new_redirect', game_id=game_id)
-    #return "new game post handler"
+        return redirect('/game/' + game_id + '/lobby')
 
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="GET")
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="POST")
@@ -129,12 +128,18 @@ def game_lobby(id):
     user_token = cookie
     info = game_handler.game_info(id)
     if request.method == "POST":
-        game_handler.game_sit(id, user_token, request.forms.get("seat"))
+        print(request.forms)
+        sit_index = int(request.forms.get("sit_index"))
+        if sit_index != None:
+            print("sitting:", sit_index)
+            if not game_handler.game_sit(id, user_token, sit_index):
+                return "Could not sit. Seat may be taken or seats may be full."
     print('game', info);
     if info == None:
         abort(404, "Unknown game id.")
     seats = game_handler.game_list_seats(id)
     my_seat = game_handler.game_get_seat(id, user_token)
+    print("user 'my_seat'", my_seat)
     return template('templates/lobby', game_id=id, info=info, seats=seats, my_seat=my_seat)
 
 

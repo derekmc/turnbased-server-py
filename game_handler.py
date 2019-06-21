@@ -125,7 +125,7 @@ def game_list_seats(game_id):
     # hide user tokens
     numbered_seats = {}
     for seat in seats:
-        numbered_seats[seat]
+        numbered_seats[seat] = seat
     return numbered_seats
 
 def game_get_seat(game_id, user_token):
@@ -138,14 +138,22 @@ def game_get_seat(game_id, user_token):
     return 0
 
 
-def game_sit(game_id, user_token, seat):
+def game_sit(game_id, user_token, seat=0):
     game_db = __get_game_db(game_id)
+    game_info = meta_db.get(GAME_INFO_KEY + game_id)
+    max_players = int(game_info.get("max_players", 1))
     seats = default({}, game_db.get(SEATS_KEY))
-    if seat in seats:
+    if seat == 0:
+        seat += 1
+        while seat in seats and seat <= max_players:
+            seat += 1
+    if seat in seats or seat > max_players:
         return False
+    print("sitting", seat)
     seats[seat] = user_token
     game_db.set(SEATS_KEY, seats)
     game_db.dump()
+    return True
 
 # 0 if they are not in this game.
 def game_seat(game_id, user_token):
