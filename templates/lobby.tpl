@@ -6,16 +6,26 @@
     <script>
       var game_id = "{{ game_id }}"
       var my_seat = "{{ my_seat }}"
+      window.addEventListener("load", init);
       function init(){
+          
       }
       function sit(seat){
         var sit_index_input = document.getElementById('sit_index');
         sit_index_input.value = seat;
       }
+      function stand(){
+        var sit_index_input = document.getElementById('sit_index');
+        sit_index_input.value = -1;
+      }
+
     </script>
   </head>
   <body>
     {{! nav_header }}
+    % if error_message != None:
+      <span class='error_text'> {{ error_message }} </span>
+    % end
     <h1> Game Lobby "{{ game_id }}"</h1>
     Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
     <form method="POST">
@@ -34,7 +44,7 @@
             </td>
             <td>
               %if int(my_seat) == i+1:
-                <button> Stand </button>
+                <input type="submit" onclick="stand()"; value="Stand"> </input>
               %elif i+1 in seats:
                 Player {{i+1}}
               %elif my_seat == 0 and info.get('choose_seats',True):

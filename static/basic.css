@@ -23,6 +23,14 @@ a:visited{ color: blue; }
 .nav a{ font-size: 88%; text-decoration: none; margin-right: 1em; color: #fff; font-weight: normal; }
 .nav a:visited{ color: #fff; }
 
+.error_text {
+    background: #faa;
+    font-weight: bold;
+    padding: .5em 1em;
+    color: red;
+    border-radius: 0.45em;
+}
+
 input[type=submit], button{
     font-size:116%; text-transform: uppercase;
     font-family: monospace; font-weight: bold; }

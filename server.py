@@ -127,22 +127,36 @@ def game_lobby(id):
     cookie = get_session()
     user_token = cookie
     info = game_handler.game_info(id)
+    error_message = None
     if request.method == "POST":
         print(request.forms)
         sit_index = int(request.forms.get("sit_index"))
         if sit_index != None:
             print("sitting:", sit_index)
-            if not game_handler.game_sit(id, user_token, sit_index):
-                return "Could not sit. Seat may be taken or seats may be full."
-    print('game', info);
+            if sit_index < 0:
+                if not game_handler.game_stand(id, user_token):
+                    error_message = "Could not stand. Perhaps you are not seated?"
+            elif not game_handler.game_sit(id, user_token, sit_index):
+                error_message = "Could not sit. Seat may be taken or seats may be full."
+    # print('game lobby info', info);
     if info == None:
         abort(404, "Unknown game id.")
     seats = game_handler.game_list_seats(id)
     my_seat = game_handler.game_get_seat(id, user_token)
     print("user 'my_seat'", my_seat)
-    return template('templates/lobby', game_id=id, info=info, seats=seats, my_seat=my_seat)
+
+    data = {
+        "game_id" : id,
+        "info" : info,
+        "seats" : seats,
+        "my_seat" : my_seat,
+        "error_message" : error_message,
+    }
+
+    return template('templates/lobby', **data)
 
 
+"""
 @app.route('/game/<id:re:[a-zA-Z]*>/sit')
 def game_sit(id):
     return "game sit page goes here."
@@ -151,6 +165,7 @@ def game_sit(id):
 @app.route('/game/<id:re:[a-zA-Z]*>/stand')
 def game_stand():
     pass
+"""
 
 @app.route('/game/<id:re:[a-zA-Z]*>/move')
 def game_move():

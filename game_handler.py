@@ -82,7 +82,7 @@ GameArgsSchema = {
 def new_game(args):
     paradigm = args['paradigm']
     if paradigm == None:
-        print(args)
+        # print(args)
         raise ValueError('game_handler.new_game no paradigm attribute')
     try:
         handler = game_handlers[paradigm]
@@ -149,7 +149,7 @@ def game_sit(game_id, user_token, seat=0):
             seat += 1
     if seat in seats or seat > max_players:
         return False
-    print("sitting", seat)
+    # print("sitting", seat)
     seats[seat] = user_token
     game_db.set(SEATS_KEY, seats)
     game_db.dump()
@@ -162,5 +162,17 @@ def game_seat(game_id, user_token):
 
 def game_stand(game_id, user_token):
     game_db = __get_game_db(game_id)
-    pass
+    game_info = meta_db.get(GAME_INFO_KEY + game_id)
+    started = game_info.get("started", False)
+    if started:
+        return False
+    seats = default({}, game_db.get(SEATS_KEY))
+    for seat in seats:
+        token = seats[seat]
+        if token == user_token:
+            del seats[seat]
+            game_db.set(SEATS_KEY, seats)
+            game_db.dump()
+            return True
+    return False
 
