@@ -1,4 +1,3 @@
-handle other paradigms on newgame, and populate newgame options from paradigm list
 lobby page.
 debug list games
 mygames page
