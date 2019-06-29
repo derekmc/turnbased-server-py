@@ -5,82 +5,34 @@ import sys, os
 if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
+import json, string
+import settings, util
+import server_data as data
+
 from bottle import Bottle, request, response, template, abort, \
                    static_file, BaseTemplate, redirect
-import string
-import pickledb
-import random
-import json
 
-import games.nim as handler
-import game_handler
 from games import games
-
-game_paradigms = []
-
+game_paradigms = {}
 for game in games:
-	game_paradigms.append(game.info)
-
-
-DATA_FOLDER = sys.argv[1] if len(sys.argv) > 1 else 'data'
-NAV_TEMPLATE_FILE = "templates/nav.html.tpl"
-DB_FILE = "server_data.db"
-COOKIE = "SESSION_ID"
-COOKIE_KEY = "cookie|"
-COOKIE_LEN = 8 
-COOKIE_TRIES = 6 
-
-
-if not os.path.exists(DATA_FOLDER):
-    os.makedirs(DATA_FOLDER)
-
-db = pickledb.load(DATA_FOLDER + "/" + DB_FILE, True)
-app = Bottle()
-
-
-# TODO list paradigms
-
-
-def read_file(name):
-    _f = open(name)
-    result = _f.read()
-    _f.close()
-    return result
-
-nav_html_contents = read_file(NAV_TEMPLATE_FILE)
-
-BaseTemplate.defaults['nav_header'] = nav_html_contents
-def gen_randomstring(n):
-    return ''.join(random.choice(string.ascii_letters) for x in range(n))
-
-def gen_cookie():
-    for i in range(COOKIE_TRIES):
-        cookie = gen_randomstring(COOKIE_LEN)
-        if not db.get(COOKIE_KEY + cookie):
-            return cookie
-    raise Exception("No cookies left in the jar")
-    # raise Exception("Could not find available cookie")
-
+	game_paradigms[game.info.name] = game
 
 def get_session():
-    cookie = request.get_cookie(COOKIE)
-
-    # check if cookie is valid
-    if cookie and db.get(COOKIE_KEY + cookie):
+    cookie = request.get_cookie(settings.COOKIE_NAME)
+    # check if cookie is exists
+    if cookie and cookie in data.cookies:
         return cookie
-
-    cookie = gen_cookie()
-    response.set_cookie(COOKIE, cookie, path='/')
-    db.set(COOKIE_KEY + cookie, cookie)
-
+    cookie = util.gen_token(settings.COOKIE_LEN, chars=string.ascii_letters.upper())
+    response.set_cookie(settings.COOKIE_NAME, cookie)
+    data.cookies.add(cookie)
     return cookie
 
 
+app = Bottle()
 @app.route('/')
 def index():
-    cookie = get_session()
+    get_session()
     return template('templates/index')
-
 
 @app.route('/static/<filepath:re:.*>', method="GET")
 def static_resource(filepath):
@@ -106,6 +58,7 @@ def games_new_page():
     }
     return template('templates/new_game', data=data)
 
+
 # TODO json api vs page navigation.
 @app.route('/new', method='POST')
 def games_new_page():
@@ -115,11 +68,21 @@ def games_new_page():
         'max_players': request.forms.get('max_players'),
         'choose_seats': request.forms.get('choose_seats'),
     }
-    game_id = game_handler.new_game(game_args)
-    if game_id == None:
-        abort(404, "Cannot create new game.")
-    else:
-        return redirect('/game/' + game_id + '/lobby')
+    paradigm = game_args['paradigm']
+    if paradigm == None:
+        raise ValueError('new_game: no paradigm attribute')
+    try:
+        handler = game_handlers[paradigm]
+    except KeyError:
+        raise ValueError('new_game: unknown game paradigm: ' + paradigm)
+
+    game_id = util.gen_token()
+
+    game = {}
+    game.info = copy.deepcopy(game_args)
+    data.games[game_id] = game
+
+    return redirect('/game/' + game_id + '/lobby')
 
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="GET")
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="POST")
@@ -174,6 +137,8 @@ def game_move():
 
 
 if __name__ == "__main__":
+    with open(settings.NAV_FILE) as file:
+        BaseTemplate.defaults['nav_header'] = file.read()
     app.run(debug=True)
     #app.run(debug=False)
 
