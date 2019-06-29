@@ -15,7 +15,7 @@ from bottle import Bottle, request, response, template, abort, \
 from games import games
 game_paradigms = {}
 for game in games:
-	game_paradigms[game.info.name] = game
+	game_paradigms[game.info['name']] = game.info
 
 def get_session():
     cookie = request.get_cookie(settings.COOKIE_NAME)
@@ -40,23 +40,27 @@ def static_resource(filepath):
 
 @app.route('/list')
 def games_list():
-    game_list = game_handler.list_games()
+    game_list = []
+    for game in data.games:
+        game_list.append(game)
     return template('templates/list_games', game_list=json.dumps(game_list))
 
 @app.route('/mygames')
 def my_games():
     #todo handler.my_games()
-    game_list = game_handler.list_games()
+    game_list = []
+    for game in data.games:
+        game_list.append(game)
     return template('templates/my_games', game_list=json.dumps(game_list))
 
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/new', method='GET')
 def games_new_page():
-    data = {
+    _data = {
         "paradigms" : game_paradigms
     }
-    return template('templates/new_game', data=data)
+    return template('templates/new_game', data=_data)
 
 
 # TODO json api vs page navigation.
