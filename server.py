@@ -5,7 +5,7 @@ import sys, os
 if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
-import json, string
+import json, string, copy
 import settings, util
 import server_data as data
 
@@ -76,14 +76,14 @@ def games_new_page():
     if paradigm == None:
         raise ValueError('new_game: no paradigm attribute')
     try:
-        handler = game_handlers[paradigm]
+        handler = game_paradigms[paradigm]
     except KeyError:
         raise ValueError('new_game: unknown game paradigm: ' + paradigm)
 
-    game_id = util.gen_token()
+    game_id = util.gen_token(settings.GAME_ID_LEN)
 
-    game = {}
-    game.info = copy.deepcopy(game_args)
+    game = {"seats":[]}
+    game['info'] = copy.deepcopy(game_args)
     data.games[game_id] = game
 
     return redirect('/game/' + game_id + '/lobby')
@@ -93,7 +93,10 @@ def games_new_page():
 def game_lobby(id):
     cookie = get_session()
     user_token = cookie
-    info = game_handler.game_info(id)
+    if not id in data.games:
+        return abort(404, "Unknown game id.")
+    game = data.games[id]
+    info = game['info']
     error_message = None
     if request.method == "POST":
         print(request.forms)
@@ -105,14 +108,16 @@ def game_lobby(id):
                     error_message = "Could not stand. Perhaps you are not seated?"
             elif not game_handler.game_sit(id, user_token, sit_index):
                 error_message = "Could not sit. Seat may be taken or seats may be full."
-    # print('game lobby info', info);
-    if info == None:
-        abort(404, "Unknown game id.")
-    seats = game_handler.game_list_seats(id)
-    my_seat = game_handler.game_get_seat(id, user_token)
+    info = game['info']
+    seats = game['seats']
+    my_seat = 0
+    for i in range(len(seats)):
+        if seats[i] == cookie:
+            my_seat = i + 1
+            
     print("user 'my_seat'", my_seat)
 
-    data = {
+    template_data = {
         "game_id" : id,
         "info" : info,
         "seats" : seats,
@@ -120,7 +125,7 @@ def game_lobby(id):
         "error_message" : error_message,
     }
 
-    return template('templates/lobby', **data)
+    return template('templates/lobby', **template_data)
 
 
 """
