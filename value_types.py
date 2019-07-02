@@ -1,8 +1,8 @@
 
 import enum
 
-definitions = enum.Enum("definitions", "ANY")
-ANY = definitions.ANY
+# definitions = enum.Enum("definitions", "ANY")
+# ANY = definitions.ANY
 
 def typecheck(*arg):
     if len(arg) < 2:
@@ -44,11 +44,44 @@ def typecheck_single(example, value):
             if not typecheck_single(example[i], value[i]):
                 return False
         return True
+
     if isinstance(example, dict):
         if not isinstance(value, dict):
             return False
+        has_default = False
+        default = None
+        if '' in example:
+            has_default = True
+            default = example['']
+        for k in example:
+            if k == '':
+                continue
+            if not k in value:
+                return False
+            if not typecheck_single(example[k], value[k]):
+                return False
+        for k in value:
+            if not k in example:
+                if has_default:
+                    if not typecheck_single(default, value[k]):
+                        print('default does not match.')
+                        return False
+                else:
+                    return False
         return True
-
+    if isinstance(example, set):
+        if not isinstance(value, set):
+            return False
+        if len(example) == 0:
+            return True
+        for x in value:
+            has_match = False
+            for y in example:
+                if typecheck_single(y, x):
+                    has_match = True
+            if not has_match:
+                return False
+        return True
         
 def test():
     T = typecheck
@@ -59,6 +92,8 @@ def test():
     T('', 'test')
     T([0,0,0], [1,2,3])
     T((0,0,['','']), (1,2,['a','bcde']))
+    T({'': 0}, {'a': 1, 'b':2, 'c': 3})
+    T({0,'a'}, {1,2,'asdf'})
     print("Value Types tests finished.")
     
     
