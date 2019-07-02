@@ -27,16 +27,23 @@ def typecheck_single(example, value):
     if isinstance(example, complex):
         return isinstance(value, complex)
     
-    if isinstance(example, tuple):
-        if not isinstance(value, tuple):
+    if isinstance(example, list) or isinstance(example, tuple):
+        if (isinstance(example, list) and not isinstance(value, list) or
+            isinstance(example, tuple) and not isinstance(value, tuple)):
             return False
         l = len(example)
-        return l == len(value)
-    if isinstance(example, list):
-        if not isinstance(value, list):
+        if l == 1:
+            t = example[0]
+            for x in value:
+                if not typecheck_single(t, x):
+                    return False
+            return True
+        elif l != len(value):
             return False
-        l = len(example)
-        return l ==1 or l == len(value)
+        for i in range(l):
+            if not typecheck_single(example[i], value[i]):
+                return False
+        return True
     if isinstance(example, dict):
         if not isinstance(value, dict):
             return False
@@ -50,6 +57,8 @@ def test():
     T(0, -5)
     T(0.0, 3.14159263)
     T('', 'test')
+    T([0,0,0], [1,2,3])
+    T((0,0,['','']), (1,2,['a','bcde']))
     print("Value Types tests finished.")
     
     
