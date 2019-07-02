@@ -90,12 +90,13 @@ def typecheck_single(example, value):
                     if not typecheck_single(default, value[k]):
                         prefix = OPTIONAL_PREFIX
                         # default variants
+                        default_variant_match = False
                         while prefix in example:
                             if typecheck_single(example[prefix], value[k]):
-                                has_variant_match = True
+                                default_variant_match = True
                                 break
                             prefix += OPTIONAL_PREFIX
-                        if not has_variant_match:
+                        if not default_variant_match:
                             print('default does not match.')
                             return False
                 else:
