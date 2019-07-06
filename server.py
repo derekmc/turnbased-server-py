@@ -15,7 +15,7 @@ from bottle import Bottle, request, response, template, abort, \
 from games import games
 game_paradigms = {}
 for game in games:
-	game_paradigms[game.info['name']] = game.info
+	game_paradigms[game.info['name']] = game
 
 def get_session():
     cookie = request.get_cookie(settings.COOKIE_NAME)
@@ -66,19 +66,34 @@ def games_new_page():
 # TODO json api vs page navigation.
 @app.route('/new', method='POST')
 def games_new_page():
-    game_args = {
-        'paradigm': request.forms.get('game_paradigm'),
-        'min_players': request.forms.get('min_players'),
-        'max_players': request.forms.get('max_players'),
-        'choose_seats': request.forms.get('choose_seats'),
-    }
-    paradigm = game_args['paradigm']
+    paradigm = request.forms.get('game_paradigm')
+    min_players = request.forms.get('min_players')
+    max_players = request.forms.get('max_players')
+    choose_seats = request.forms.get('choose_seats')
+
     if paradigm == None:
         raise ValueError('new_game: no paradigm attribute')
     try:
-        handler = game_paradigms[paradigm]
+        info = game_paradigms[paradigm].info
     except KeyError:
         raise ValueError('new_game: unknown game paradigm: ' + paradigm)
+
+    # check against paradigm allowed values.
+    __max_players = info['max_players']
+    __min_players = info['min_players']
+
+    if min_players == "" or min_players < __min_players:
+        min_players = __min_players
+    if max_players == "" or max_players > __max_players:
+        max_players = __max_players
+
+    game_args = {
+        'paradigm': paradigm,
+        'min_players': min_players,
+        'max_players': max_players,
+        'choose_seats': choose_seats,
+    }
+    print('game_args', game_args)
 
     game_id = util.gen_token(settings.GAME_ID_LEN)
 
@@ -93,6 +108,19 @@ def games_new_page():
 def game_lobby(id):
     cookie = get_session()
     user_token = cookie
+    error_data = {
+      "error_message": "An error ocurred.",
+      "destination": "/game/" + id + "/lobby/",
+    }
+    try:
+        game = data.games[id]
+    except KeyError:
+        error_data['destination'] = '/'
+        # the id should be clean because it matches the id regex which only allows letters.
+        error_data['error_message'] = "Unknown game: '" + id + '" '
+        return template('templates/error', **error_data)
+
+
     if not id in data.games:
         return abort(404, "Unknown game id.")
     game = data.games[id]
@@ -127,12 +155,50 @@ def game_lobby(id):
 
     return template('templates/lobby', **template_data)
 
+@app.route('/game/<id:re:[a-zA-Z]*>/sit', method="POST")
+def game_sit(id):
+    cookie = get_session()
+    error_data = {
+      "error_message": "An error ocurred.",
+      "destination": "/game/" + id + "/lobby/",
+    }
+    try:
+        game = data.games[id]
+    except KeyError:
+        error_data['destination'] = '/'
+        # the id should be clean because it matches the id regex which only allows letters.
+        error_data['error_message'] = "Unknown game: '" + id + '" '
+        return template('templates/error', **error_data)
+
+    print('game sit form', request.forms)
+    info = game['info']
+    seats = game['seats']
+    sit_index = int(request.forms.get("seat_index"))
+    if sit_index != None:
+        print("sitting:", sit_index)
+        if sit_index < 0:
+            if not cookie in seats:
+                error_data['error_message'] = "Could not stand. Perhaps you are not seated?"
+                return template('templates/error', **error_data)
+            else:
+                if len(seats) < sit_index + 1:
+                    # extend array
+                    seats = seats + [""] * (sit_index + 1 - len(seats))
+                seats[sit_index] = cookie
+        else:
+            if sit_index > info['max_players']:
+                error_data['error_message'] = "Could not sit. Only " + str(info['max_players']) + " allowed."
+                return template('templates/error', **error_data)
+            if len(seats) > sit_index and seats[sit_index] != "":
+                error_data['error_message'] = "Could not sit. Seat " + str(sit_index + 1) + " taken."
+                return template('templates/error', **error_data)
+                
+            error_message = "Could not sit. Seat may be taken or seats may be full."
+
+    return redirect('/game/' + id + '/lobby')
+
 
 """
-@app.route('/game/<id:re:[a-zA-Z]*>/sit')
-def game_sit(id):
-    return "game sit page goes here."
-
 
 @app.route('/game/<id:re:[a-zA-Z]*>/stand')
 def game_stand():
