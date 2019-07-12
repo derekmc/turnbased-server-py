@@ -7,6 +7,8 @@ OPTIONAL_PROPERTY_PREFIX = "$"
 DEFAULT_VALUE_KEY = ""
 
 def typecheck(*arg):
+    if len(arg) < 2:
+        return
     if len(arg) == 2:
         check_result = typecheck_single(arg[0], arg[1])
         if check_result == True:
@@ -114,20 +116,20 @@ def typecheck_single(example, value, type_path = ""):
             has_variant = False
             variant_match = False
             while prefix_key in example:
-                check_result = typecheck_single(default_type, value[k], new_type_path)
+                has_variant = True
+                check_result = typecheck_single(example[prefix_key], value[k], new_type_path)
                 if check_result == True:
-                    has_variant = True
                     variant_match = True
                 prefix_key = OPTIONAL_PROPERTY_PREFIX + prefix_key
             if variant_match:
                 continue
             if not k in example:
-                if has_default:
+                if has_variant: #variant_match must be false to get here.
+                    return err_msg("Property did not match any variant '" + str(k) + "'")
+                elif has_default:
                     check_result = typecheck_single(default_type, value[k], new_type_path)
                     if check_result != True:
                         return check_result
-                elif has_variant:
-                    return err_msg("Property did not match any variant '" + str(k) + "'")
                 else:
                     return err_msg("Unknown property '" + str(k) + "'")
             else:
@@ -144,18 +146,42 @@ def typecheck_single(example, value, type_path = ""):
         return True
 #TODO sets
 
+def expectTypeError(code, test_name=None):
+    code = "T(" + code + ")"
+    try:
+        T = typecheck
+        eval(code)
+    except TypeError:
+        return
+    if test_name == None:
+        test_name = code
+    raise TypeError("Expected type error for test: '" + test_name + "'")
+
 
 def test():
     T = typecheck
+    TE = expectTypeError
     T(0, 5)
     T(5, 0)
     T(0.0, 5.0)
-    #T(0, 99.0)
-    #T("", [0,0,[0],0], [1,2,[3.0], 4])
+    T(-5, 0)
+    T(0, -5)
+    TE(" 0.0, 0 ")
+    TE(" 0, 99.0 ")
+    TE(" '', 0 ")
+    TE(" 0, '' ")
+    TE(" 0.0, int(0.0)")
+    TE("0, 99.0")
+    TE(" '', [0,0,[0],0], [1,2,[3.0], 4]")
     T((0,0,0), (1,2,3))
     T((), ())
-    T({"",0}, {'a', 'b', 'c', 1, 2, 3})
-    T({"": ('','')}, {"test": ('a', 'b')})
+    T({'',0}, {'a', 'b', 'c', 1, 2, 3})
+    TE("{'',0}, {'a', 'b', 'c', 1, 2, 3.0}")
+    T({'': ('',''),}, {'test': ('a', 'b')})
+    TE("{'': ('',''), '$test': (1, 2)}, {'test': ('a', 'b')}")
+    T({'': ('',''), '$test': (1, 2)}, {})
+    TE("(0), (99.0)")
+    T()
     pass
     
     
