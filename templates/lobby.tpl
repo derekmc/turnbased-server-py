@@ -10,6 +10,7 @@
       function init(){
           
       }
+      /*
       function sit(seat){
         var sit_index_input = document.getElementById('sit_index');
         sit_index_input.value = seat;
@@ -18,6 +19,7 @@
         var sit_index_input = document.getElementById('sit_index');
         sit_index_input.value = -1;
       }
+      */
 
     </script>
   </head>
@@ -28,8 +30,6 @@
     % end
     <h1> Game Lobby "{{ game_id }}"</h1>
     Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
-    <form method="POST">
-      <input id="sit_index" name="sit_index" type="hidden" value="0"/>
       <table style="min-width: 240px;">
         <tr><th> Seat </th> <th> Player </th></tr>
         %for i in range(int(info['max_players'])):
@@ -44,11 +44,17 @@
             </td>
             <td>
               %if int(my_seat) == i+1:
-                <input type="submit" onclick="stand()"; value="Stand"> </input>
+                <form method="POST" action="./sit">
+                  <input id="seat_index" name="seat_index" type="hidden" value="-1"/>
+                  <input type="submit" value="Stand"> </input>
+                </form>
               %elif i+1 in seats:
                 Player {{i+1}}
               %elif my_seat == 0 and info.get('choose_seats',True):
-                <input type="submit" onclick="sit({{i+1}})" value="Sit"> </input>
+                <form method="POST" action="./sit">
+                  <input id="seat_index" name="seat_index" type="hidden" value="{{i+1}}"/>
+                  <input type="submit" value="Sit"> </input>
+                </form>
               %else:
                 -
               %end
@@ -77,7 +83,5 @@
         <tr><td colspan=2><button> Take Next Seat </button> <button> Enter Game</button></td></tr-->
       </table>
       <br>
-    </form>
-    
   </body>
 </html>

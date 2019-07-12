@@ -18,12 +18,7 @@
         if(max < min) id("max_players").value = min;
       }
       % import json
-      var paradigm_list = {{! json.dumps(data['paradigms'])}}
-      // alert(JSON.stringify(paradigm_list));
-      var paradigms = {};
-      for(var i=0; i<paradigm_list.length; ++i){
-          var paradigm = paradigm_list[i];
-          paradigms[paradigm.name] = paradigm; }
+      var paradigms = {{! json.dumps(data['paradigms'])}}
       function updateParadigm(name){
          var name = id("game_paradigm").value;
          var paradigm = paradigms[name];
@@ -51,8 +46,8 @@
           <td> Game Type </td>
           <td>
             <select name="game_paradigm" id="game_paradigm" onchange="updateParadigm();">
-              %for paradigm in data['paradigms']:
-                <option value="{{paradigm['name']}}"> {{paradigm['name']}} </option>
+              %for name in data['paradigms']:
+                <option value="{{name}}"> {{name}} </option>
               %end
             </select><br>
           </td>
