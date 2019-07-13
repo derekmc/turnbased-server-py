@@ -29,7 +29,7 @@
       <span class='error_text'> {{ error_message }} </span>
     % end
     <h1> Game Lobby "{{ game_id }}"</h1>
-    Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
+    Game - <b><i>{{info['name']}}</i></b> <br><br>
       <table style="min-width: 240px;">
         <tr><th> Seat </th> <th> Player </th></tr>
         %for i in range(int(info['max_players'])):

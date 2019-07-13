@@ -14,7 +14,7 @@ def typecheck(*arg):
         if check_result == True:
             return arg[1]
         else:
-            raise TypeError("For value: " + str(arg[0]) + "\n  " + str(check_result[0]) + ". type: " + str(check_result[1]) + ", value: " + str(check_result[2]) + ";")
+            raise TypeError("For value: " + str(arg[1]) + "\n  " + str(check_result[0]) + ". type: " + str(check_result[1]) + ", value: " + str(check_result[2]) + ";")
 
     types = arg[:-1]
     value = arg[-1]

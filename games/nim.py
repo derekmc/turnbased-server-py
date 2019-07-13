@@ -6,9 +6,6 @@ except:
     print("jsonschema not available, no validation will be performed.")
     validate = lambda x,y: True
 
-Version = "dev"
-GameParadigm = "Nim"
-
 NimStateSchema = {
     "type": "object",
     "additionalProperties": False,

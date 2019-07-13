@@ -72,12 +72,14 @@ def games_new_page():
     paradigm = request.forms.get('game_paradigm')
     min_players = int(request.forms.get('min_players'))
     max_players = int(request.forms.get('max_players'))
-    choose_seats = request.forms.get('choose_seats')
+    choose_seats = request.forms.get('choose_seats') == 'on'
 
+    
     if paradigm == None:
         raise ValueError('new_game: no paradigm attribute')
     try:
-        info = game_paradigms[paradigm].info
+        game_handler = game_paradigms[paradigm]
+        info = game_handler.info
     except KeyError:
         raise ValueError('new_game: unknown game paradigm: ' + paradigm)
 
@@ -89,19 +91,28 @@ def games_new_page():
         min_players = info_min_players
     if max_players == "" or max_players > info_max_players:
         max_players = info_max_players
-
+        
     game_args = {
-        'paradigm': paradigm,
+        'name': paradigm,
         'min_players': min_players,
         'max_players': max_players,
         'choose_seats': choose_seats,
     }
+    
+    # TODO handle initial state when first move is made.
+    #init_state = {}
+    #if hasattr(game_handler, "init"):
+    #    init_state = game_handler.init(game_args)
+
     print('game_args', game_args)
 
     game_id = util.gen_token(settings.GAME_ID_LEN)
 
-    game = {"seats":[]}
-    game['info'] = copy.deepcopy(game_args)
+    game = {"state": None,
+            "info": copy.deepcopy(game_args),
+            "status": {"is_started": False, "is_finished": False},
+            "chat": "",
+            "seats": []}
     data.games[game_id] = game
 
     return redirect('/game/' + game_id + '/lobby')
@@ -147,6 +158,7 @@ def game_lobby(id):
             my_seat = i + 1
             
     print("user 'my_seat'", my_seat)
+    print("seats", seats)
 
     template_data = {
         "game_id" : id,
@@ -160,13 +172,14 @@ def game_lobby(id):
 
 @app.route('/game/<id:re:[a-zA-Z]*>/sit', method="POST")
 def game_sit(id):
+    print("Game Sit called.")
     cookie = get_session()
     error_data = {
       "error_message": "An error ocurred.",
       "destination": "/game/" + id + "/lobby/",
     }
     try:
-        game = data.games[id]
+        game = T(data.Game, data.games[id])
     except KeyError:
         error_data['destination'] = '/'
         # the id should be clean because it matches the id regex which only allows letters.

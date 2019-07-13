@@ -22,8 +22,9 @@ GameStatus = { "is_started": False,
                "$score": GameScore}
 
 GameInfo = { "name": "",
+             "$game_name": "",
              "$version": "",
-             # turn stuff
+             # configuration and turn stuff
              "$turn_sequence": [0],
              "$initial_time": 0, # total starting time
              "$turn_time": 0, # fixed amount of time per turn
@@ -31,7 +32,8 @@ GameInfo = { "name": "",
              #player stuff
              "min_players": 0,
              "max_players": 0,
-             "live_seating": False }
+             "$live_seating": False,
+             "$choose_seats": False, }
 
 Game = { "state": None,
          "info": GameInfo,
