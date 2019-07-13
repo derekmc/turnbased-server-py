@@ -7,15 +7,18 @@ if sys.version_info[0] != 3:
 
 import json, string, copy
 import settings, util
-import server_data as data
+import data
+from value_types import typecheck as T
 
 from bottle import Bottle, request, response, template, abort, \
                    static_file, BaseTemplate, redirect
 
 from games import games
 game_paradigms = {}
+paradigm_info = {}
 for game in games:
-	game_paradigms[game.info['name']] = game
+    paradigm_info[game.info['name']] = T(data.GameInfo, game.info)
+    game_paradigms[game.info['name']] = game
 
 def get_session():
     cookie = request.get_cookie(settings.COOKIE_NAME)
@@ -58,7 +61,7 @@ def my_games():
 @app.route('/new', method='GET')
 def games_new_page():
     _data = {
-        "paradigms" : game_paradigms
+        "paradigms" : paradigm_info
     }
     return template('templates/new_game', data=_data)
 
@@ -67,8 +70,8 @@ def games_new_page():
 @app.route('/new', method='POST')
 def games_new_page():
     paradigm = request.forms.get('game_paradigm')
-    min_players = request.forms.get('min_players')
-    max_players = request.forms.get('max_players')
+    min_players = int(request.forms.get('min_players'))
+    max_players = int(request.forms.get('max_players'))
     choose_seats = request.forms.get('choose_seats')
 
     if paradigm == None:
@@ -79,13 +82,13 @@ def games_new_page():
         raise ValueError('new_game: unknown game paradigm: ' + paradigm)
 
     # check against paradigm allowed values.
-    __max_players = info['max_players']
-    __min_players = info['min_players']
+    info_max_players = info['max_players']
+    info_min_players = info['min_players']
 
-    if min_players == "" or min_players < __min_players:
-        min_players = __min_players
-    if max_players == "" or max_players > __max_players:
-        max_players = __max_players
+    if min_players == "" or min_players < info_min_players:
+        min_players = info_min_players
+    if max_players == "" or max_players > info_max_players:
+        max_players = info_max_players
 
     game_args = {
         'paradigm': paradigm,

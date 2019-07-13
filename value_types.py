@@ -181,9 +181,9 @@ def test():
     TE("{'': ('',''), '$test': (1, 2)}, {'test': ('a', 'b')}")
     T({'': ('',''), '$test': (1, 2)}, {})
     TE("(0), (99.0)")
-    T()
-    pass
+    # T()
     
     
 if __name__ == "__main__":
     test()
+    print("Tests finished.")
