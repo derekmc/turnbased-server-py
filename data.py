@@ -21,6 +21,7 @@ GameStatus = { "is_started": False,
                "is_finished": False,
                "$score": GameScore}
 
+# use for either the paradigm or the live game.
 GameInfo = { "name": "",
              "$game_name": "",
              "$version": "",
