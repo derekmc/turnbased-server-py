@@ -40,7 +40,7 @@
          
           var tr = elem(table, 'tr');
           elem(elem(tr, 'td'), 'a', {href: '/game/' + game.id + '/lobby', text: game.id});
-          elem(tr, 'td', {text: game.paradigm});
+          elem(tr, 'td', {text: game.name});
           elem(tr, 'td', {text: min_players == max_players? min_players : min_players + " - " + max_players});
         }
       }

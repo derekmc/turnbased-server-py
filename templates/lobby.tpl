@@ -48,7 +48,7 @@
                   <input id="seat_index" name="seat_index" type="hidden" value="-1"/>
                   <input type="submit" value="Stand"> </input>
                 </form>
-              %elif i+1 in seats:
+              %elif i < len(seats) and seats[i] != "":
                 Player {{i+1}}
               %elif my_seat == 0 and info.get('choose_seats',True):
                 <form method="POST" action="./sit">
@@ -62,7 +62,12 @@
           </tr>
         %end
         %if not info.get('choose_seats',True) and my_seat == 0:
-          <tr><td colspan=2><button> Take Next Seat </button></td></tr>
+          <td colspan=2>
+            <form method="POST" action="./sit">
+              <input id="seat_index" name="seat_index" type="hidden" value="0"/>
+              <input type="submit" value="Take Next Seat"> </input>
+            </form>
+          </td>
         %end
         <tr>
           <td colspan=2>
@@ -75,6 +80,7 @@
             %end
           </td>
         </tr>
+        <!--Seats: {{seats}}-->
         <!--
         <tr><td> 1 </td> <td> Player 1 </td></tr>
         <tr><td> 2 </td> <td><button disabled > Sit </button></td></tr>
