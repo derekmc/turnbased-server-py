@@ -48,7 +48,7 @@ def games_list():
         game_info = copy.deepcopy(data.games[game_id]['info'])
         game_info['id'] = game_id
         game_infos.append(game_info)
-    return template('templates/list_games', game_list=json.dumps(game_infos))
+    return template('templates/list_games', game_list=game_infos)
 
 @app.route('/mygames')
 def my_games():
