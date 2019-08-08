@@ -18,7 +18,8 @@ UserToken = "example_token" # for now this is just the cookie
 GameScore = { "$seat_scores": [NumericScore],
               "$seat_ranks": [SeatRank], 
               "$winners": [SeatIndex],
-              "$losers": [SeatIndex]}
+              "$losers": [SeatIndex], 
+              "$game_over": False,}
 
 GameStatus = { "is_started": False,
                "is_finished": False,
@@ -35,7 +36,7 @@ GameInfo = {
              #player stuff
              "min_players": 0,
              "max_players": 0,
-             "$live_seating": False,
+             # TODO "$live_seating": False,
              "$choose_seats": False, }
 
 Game = { "state": None,

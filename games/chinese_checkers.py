@@ -2,7 +2,7 @@
 info = {
     "paradigm": "Chinese Checkers",
     "version": "dev",
-    "live_seating": False,
+    #"live_seating": False,
     # TODO make sure turns go around the board counter clockwise, instead of in 
     "turn_sequence": [1, 4, 5, 2, 3, 6],
     "min_players": 2,
@@ -15,7 +15,7 @@ def __board_to_text(board):
     result = ""
     for i in range(n):
         line = lines[i]
-        result += " " * (n - i - 1) + " ".join(line.split("")) + "\n"
+        result += " " * (n - i - 1) + " ".join(list(line)) + "\n"
     return result
 
 def __parse_move(move):
@@ -189,11 +189,15 @@ def __make_move(board, pos_list):
 
 
 def init(init_args):
-    player_count = init_args.get('player_count', 2),
+    print(init_args)
+    player_count = 2
+    if 'player_count' in init_args:
+        player_count = init_args['player_count']
     board_str = start_board_str
+    print(player_count)
 
-    for i in range(player_count + 1, 6):
-        board_str = board_str.replace
+    for i in range(int(player_count) + 1, 7):
+        board_str = board_str.replace(str(i), " ")
     data = {
         'player_count' : player_count,
         'board' : start_board_str,

@@ -25,9 +25,6 @@
   </head>
   <body>
     {{! nav_header }}
-    % if error_message != None:
-      <span class='error_text'> {{ error_message }} </span>
-    % end
     <h1> Game Lobby "{{ game_id }}"</h1>
     Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
       <table style="min-width: 240px;">
@@ -73,9 +70,9 @@
           <td colspan=2>
             %if my_seat == 0:
               <button disabled> Enter Game </button>
-              <button> Spectate Game </button>
+              <a href="./textplay"><button> Spectate Game </button></a>
             %else:
-              <button> Enter Game </button>
+              <a href="./textplay"><button> Enter Game </button></a>
               <button disabled> Spectate Game </button>
             %end
           </td>

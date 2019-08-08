@@ -223,13 +223,13 @@ def game_sit(id):
 
     return redirect('/game/' + id + '/lobby')
 
-@app.route('/game/<id:re:[a-zA-Z]*>/test')
+@app.route('/game/<id:re:[a-zA-Z]*>/textplay')
 def game_play_text(id):
     print("'Game Play Text' called.")
     cookie = get_session()
     error_data = {
       "error_message": "An error ocurred.",
-      "destination": "/game/" + id + "/lobby",
+      "destination": "/game/" + id + "/textplay",
     }
     try:
         game = T(data.Game, data.games[id])
@@ -238,18 +238,46 @@ def game_play_text(id):
         # the id should be clean because it matches the id regex which only allows letters.
         error_data['error_message'] = "Unknown game: '" + id + '" '
         return template('templates/error', **error_data)
+    paradigm = game_paradigms[game['info']['paradigm']]
     info = game['info']
+    status = game['status']
     seats = game['seats']
     my_seat = 0
+    player_count = 0
     for i in range(len(seats)):
+        if len(seats[i]):
+            player_count += 1
         if seats[i] == cookie:
             my_seat = i + 1
- 
-    paradigm = game_paradigms[game['info']['paradigm']]
-    handler = paradigm.text_handler
-    view = handler['view']
+
+    if not status['is_started']:
+        # make sure only players can start the game, not spectators.
+        if my_seat == 0:
+            error_data['error_message'] = "Game hasn't started."
+            error_data['destination'] = "/game/" + id + "/lobby"
+            return template('templates/error', **error_data)
+
+        # check minimum player count
+        if player_count < info['min_players']:
+            error_data['error_message'] = "Not enough players to start."
+            error_data['destination'] = "/game/" + id + "/lobby"
+            return template('templates/error', **error_data)
+
+        # remove empty seats
+        game['seats'] = filter("", seats)
+        init_args = {
+            "player_count" : player_count
+        }
+        #print(init_args)
+
+        game['state'] = paradigm.init(init_args)
+        status['is_started'] = True
+
+
+    text_handler = paradigm.text_handler
+    view = text_handler['view']
     # TODO handle post request
-    # parseMove = handler['parseMove']
+    # parseMove = text_handler['parseMove']
     # move = parseMove(
     print(game)
     game_text = view(game['state'])
@@ -259,6 +287,7 @@ def game_play_text(id):
         "game_text" : game_text,
         "seats" : ["x" if len(seat) else "" for seat in seats],
         "my_seat" : my_seat,
+        "info" : info,
     }
 
     return template('templates/lobby', **template_data)

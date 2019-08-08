@@ -31,7 +31,7 @@ def __turn_seat(turn, seats=2):
 info = {
   "paradigm": "Nim",
   "version" : 'dev',
-  "live_seating" : False,
+  #"live_seating" : False,
   "min_players": 2,
   "max_players": 2,
 }
