@@ -43,6 +43,7 @@ def static_resource(filepath):
 
 @app.route('/list')
 def games_list():
+    get_session()
     game_infos = []
     for game_id in data.games:
         game_info = copy.deepcopy(data.games[game_id]['info'])
@@ -52,6 +53,7 @@ def games_list():
 
 @app.route('/mygames')
 def my_games():
+    get_session()
     #todo handler.my_games()
     game_list = []
     for game in data.games:
@@ -62,6 +64,7 @@ def my_games():
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/new', method='GET')
 def games_new_page():
+    get_session()
     _data = {
         "paradigms" : paradigm_info
     }
@@ -71,6 +74,7 @@ def games_new_page():
 # TODO json api vs page navigation.
 @app.route('/new', method='POST')
 def games_new_page():
+    get_session()
     paradigm = request.forms.get('game_paradigm')
     min_players = int(request.forms.get('min_players'))
     max_players = int(request.forms.get('max_players'))
@@ -264,7 +268,7 @@ def game_play_text(id):
             return template('templates/error', **error_data)
 
         # remove empty seats
-        game['seats'] = filter("", seats)
+        game['seats'] = [seat for seat in seats if len(seat)]
         init_args = {
             "player_count" : player_count
         }
@@ -290,7 +294,7 @@ def game_play_text(id):
         "info" : info,
     }
 
-    return template('templates/lobby', **template_data)
+    return template('templates/text_game', **template_data)
 
 
 

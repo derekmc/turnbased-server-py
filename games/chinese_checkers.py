@@ -15,7 +15,9 @@ def __board_to_text(board):
     result = ""
     for i in range(n):
         line = lines[i]
-        result += " " * (n - i - 1) + " ".join(list(line)) + "\n"
+        result += "-" * (n - i) + " ".join(list(line)) + "\n"
+    result = result.replace("  ", " .")
+    result = result.replace("-", " ")
     return result
 
 def __parse_move(move):
@@ -52,23 +54,23 @@ text_handler = {
 
 # dashes represent squares that can't be filled.
 start_board_str = """
-----1
-----11
-----111
-----1111 
-6666     4444
--666      444
---66       44
----6        4
-----         -
-----3        5
-----33       55
-----333      555
-----3333     5555
----------2222
-----------222
------------22
-------------2
+-----1
+-----11
+-----111
+-----1111-
+-6666     4444
+--666      444
+---66       44
+----6        4
+-----         -
+-----3        5
+-----33       55
+-----333      555
+-----3333     5555
+----------2222
+-----------222
+------------22
+-------------2
 """
 
 pieces_str = '- 123456'
@@ -200,7 +202,7 @@ def init(init_args):
         board_str = board_str.replace(str(i), " ")
     data = {
         'player_count' : player_count,
-        'board' : start_board_str,
+        'board' : board_str,
     }
     return data
 

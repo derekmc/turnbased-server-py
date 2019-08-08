@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="10; url=/game/{{game_id}}/text" />
+    <meta http-equiv="refresh" content="10; url=/game/{{game_id}}/textplay" />
     <style>
      body{ max-width: 480px; margin: 0; padding: 1em 2em; font-family: sans-serif;}
 
