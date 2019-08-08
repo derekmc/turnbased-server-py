@@ -13,11 +13,19 @@ def __board_to_text(board):
     lines = board.split("\n")
     n = len(lines)
     result = ""
-    for i in range(n):
+    result += "--" * 11 + " A B C D E F G H I J K L M N O P Q\n"
+    for i in range(1,n-1):
         line = lines[i]
-        result += "-" * (n - i) + " ".join(list(line)) + "\n"
+        result += "-" * (n - i - 1) + '%0*d' % (2, n-i-1) + " " + " ".join(list(line)) + "\n"
     result = result.replace("  ", " .")
-    result = result.replace("-", " ")
+    result = result.replace("- ", "/ ")
+    result = result.replace("--", "  ")
+    result = result.replace(" -", " /")
+    result = result.replace("//", "  ")
+    result = result.replace("/1", " 1")
+    result = result.replace("/0", " 0")
+    result = result.replace("-0", " 0")
+    result += "     A B C D E F G H I J K L M N O P Q"
     return result
 
 def __parse_move(move):
@@ -54,23 +62,23 @@ text_handler = {
 
 # dashes represent squares that can't be filled.
 start_board_str = """
------1
------11
------111
------1111-
--6666     4444
---666      444
----66       44
-----6        4
------         -
------3        5
------33       55
------333      555
------3333     5555
-----------2222
------------222
-------------22
--------------2
+-----1-------------
+-----11------------
+-----111-----------
+-----1111----------
+-6666     4444-----
+--666      444-----
+---66       44-----
+----6        4-----
+-----         -----
+-----3        5----
+-----33       55---
+-----333      555--
+-----3333     5555-
+----------2222-----
+-----------222-----
+------------22-----
+-------------2-----
 """
 
 pieces_str = '- 123456'

@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="10; url=/game/{{game_id}}/textplay" />
+    <!--<meta http-equiv="refresh" content="10; url=/game/{{game_id}}/textplay" />-->
     <style>
      body{ max-width: 480px; margin: 0; padding: 1em 2em; font-family: sans-serif;}
 
@@ -17,23 +17,11 @@
     <!-- START-SECTION: html -->
       <h2> Turnbased Game Test </h2>
       <table>
-      Paradigm: Chess <br>
-      Version: Dev <br>
-      Turn: Player 1 <br>
+      Paradigm: {{info['paradigm']}} <br>
+      Version: {{info.get('version','')}} <br>
+      Turn: <br>
       
-      <pre> {{ game_text }}
-        +-----------------+
-      8 | R N B Q K B N R |
-      7 | P P P P P P P P |
-      6 | - - - - - - - - |
-      5 | - - - - - - - - |
-      4 | - - - - - - - - |
-      3 | - - - - - - - - |
-      2 | p p p p p p p p |
-      1 | r n b q k b n r |
-        +-----------------+
-          A B C D E F G H
-      </pre>
+      <pre>{{ game_text }}</pre>
       <form>
         <!--input name="move_text" type="text" title="(example: e2 e4)">
         <input type="submit" value="Submit"/-->
@@ -44,7 +32,7 @@
          otherwise, the page will automatically refresh until it's your turn.
       </p>
       
-      <p> Example move: <b>e2 e4</b></p>
+      <p> Example move: <b></b></p>
     <!-- END-SECTION: html -->
   </body>
 </html>
