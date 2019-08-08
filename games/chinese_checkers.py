@@ -1,12 +1,30 @@
 
 info = {
-    "name": "Chinese Checkers",
+    "paradigm": "Chinese Checkers",
     "version": "dev",
     "live_seating": False,
     # TODO make sure turns go around the board counter clockwise, instead of in 
     "turn_sequence": [1, 4, 5, 2, 3, 6],
     "min_players": 2,
     "max_players": 6,
+}
+
+def __board_to_text(board):
+    lines = board.split("\n")
+    n = len(lines)
+    result = ""
+    for i in range(n):
+        line = lines[i]
+        result += " " * (n - i - 1) + " ".join(line.split("")) + "\n"
+    return result
+
+def __parse_move(move):
+    array = move.split(',')
+    return zip(array[0::2], array[1::2])
+
+text_handler = {
+   "view" : lambda data: __board_to_text(data['board']),
+   "parseMove" : __parse_move,
 }
 
 # visual board layout

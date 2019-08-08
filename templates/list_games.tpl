@@ -12,7 +12,7 @@
      <table>
       %for game in game_list:
        <tr><td><a href='/game/{{game['id']}}/lobby'>{{game['id']}}</a></td>
-           <td>{{game['name']}}</td>
+           <td>{{game['paradigm']}}</td>
        </tr>
       %end
      </table>

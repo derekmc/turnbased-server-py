@@ -29,7 +29,7 @@ def __turn_seat(turn, seats=2):
     return (turn - 1)%seats + 1
 
 info = {
-  "name": "Nim",
+  "paradigm": "Nim",
   "version" : 'dev',
   "live_seating" : False,
   "min_players": 2,

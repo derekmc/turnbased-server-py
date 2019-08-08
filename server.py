@@ -17,8 +17,8 @@ from games import games
 game_paradigms = {}
 paradigm_info = {}
 for game in games:
-    paradigm_info[game.info['name']] = T(data.GameInfo, game.info)
-    game_paradigms[game.info['name']] = game
+    paradigm_info[game.info['paradigm']] = T(data.GameInfo, game.info)
+    game_paradigms[game.info['paradigm']] = game
 
 def get_session():
     cookie = request.get_cookie(settings.COOKIE_NAME)
@@ -95,7 +95,7 @@ def games_new_page():
         max_players = info_max_players
         
     game_args = {
-        'name': paradigm,
+        'paradigm': paradigm,
         'min_players': min_players,
         'max_players': max_players,
         'choose_seats': choose_seats,
@@ -222,6 +222,49 @@ def game_sit(id):
             error_message = "Could not sit. Seat may be taken or seats may be full."
 
     return redirect('/game/' + id + '/lobby')
+
+@app.route('/game/<id:re:[a-zA-Z]*>/test')
+def game_play_text(id):
+    print("'Game Play Text' called.")
+    cookie = get_session()
+    error_data = {
+      "error_message": "An error ocurred.",
+      "destination": "/game/" + id + "/lobby",
+    }
+    try:
+        game = T(data.Game, data.games[id])
+    except KeyError:
+        error_data['destination'] = '/'
+        # the id should be clean because it matches the id regex which only allows letters.
+        error_data['error_message'] = "Unknown game: '" + id + '" '
+        return template('templates/error', **error_data)
+    info = game['info']
+    seats = game['seats']
+    my_seat = 0
+    for i in range(len(seats)):
+        if seats[i] == cookie:
+            my_seat = i + 1
+ 
+    paradigm = game_paradigms[game['info']['paradigm']]
+    handler = paradigm.text_handler
+    view = handler['view']
+    # TODO handle post request
+    # parseMove = handler['parseMove']
+    # move = parseMove(
+    print(game)
+    game_text = view(game['state'])
+
+    template_data = {
+        "game_id" : id,
+        "game_text" : game_text,
+        "seats" : ["x" if len(seat) else "" for seat in seats],
+        "my_seat" : my_seat,
+    }
+
+    return template('templates/lobby', **template_data)
+
+
+
 
 
 """

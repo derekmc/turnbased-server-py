@@ -1,6 +1,8 @@
 
 
-games = {} # {"id": {state, info, status, chat, "seats": [cookies]}
+# for now, the user_token is just their cookie
+games = {} # {"id": {state, info, status, chat, "seats": [user_token]}
+player_games = {} # {"user_token": [game_id]}
 cookies = set()  # { "woiSSeDJ" }
 
 #"status": {seat_scores, seat_ranks, seat_winners, seat_losers, is_started, is_finished}
@@ -8,12 +10,13 @@ STATUS_STARTED = "STARTED"
 STATUS_NEW = "NEW"
 STATUS_FINISHED = "FINISHED"
 
-# Value Types for Game Datastructures
+# ValueTypes type definitions for Game Datastructures
 SeatIndex = 0
 NumericScore = 0
+SeatRank = 0 # a seat rank value of zero means no rank.
 UserToken = "example_token" # for now this is just the cookie
 GameScore = { "$seat_scores": [NumericScore],
-              "$seat_ranks": [NumericScore], 
+              "$seat_ranks": [SeatRank], 
               "$winners": [SeatIndex],
               "$losers": [SeatIndex]}
 
@@ -21,9 +24,8 @@ GameStatus = { "is_started": False,
                "is_finished": False,
                "$score": GameScore}
 
-# use for either the paradigm or the live game.
-GameInfo = { "name": "",
-             "$game_name": "",
+GameInfo = {
+             "paradigm": "",
              "$version": "",
              # configuration and turn stuff
              "$turn_sequence": [0],
