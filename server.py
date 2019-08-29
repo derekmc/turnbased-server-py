@@ -158,6 +158,7 @@ def game_lobby(id):
     #            error_message = "Could not sit. Seat may be taken or seats may be full."
     info = game['info']
     seats = game['seats']
+    status = game['status']
     my_seat = 0
     for i in range(len(seats)):
         if seats[i] == cookie:
@@ -169,6 +170,7 @@ def game_lobby(id):
     template_data = {
         "game_id" : id,
         "info" : info,
+        "status" : status,
         "seats" : ["x" if len(seat) else "" for seat in seats],
         "my_seat" : my_seat,
         "error_message" : error_message,
@@ -316,7 +318,7 @@ def game_move():
 if __name__ == "__main__":
     with open(settings.NAV_FILE) as file:
         BaseTemplate.defaults['nav_header'] = file.read()
-    app.run(debug=True)
+    app.run(debug=True, server='waitress')
     #app.run(debug=False)
 
 

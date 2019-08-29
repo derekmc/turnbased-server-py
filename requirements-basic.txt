@@ -1,1 +1,4 @@
 bottle
+# the server bottle should use.  This one seems to work well with minimal requirements
+# see bottle.server_names variable for list of available servers.
+waitress

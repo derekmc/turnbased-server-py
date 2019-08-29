@@ -72,7 +72,9 @@
               <button disabled> Enter Game </button>
               <a href="./textplay"><button> Spectate Game </button></a>
             %else:
-              <a href="./textplay"><button> Enter Game </button></a>
+              <a href="./textplay"><button>
+                {{!"Enter" if status["is_started"] else "Start"}} Game
+              </button></a>
               <button disabled> Spectate Game </button>
             %end
           </td>
