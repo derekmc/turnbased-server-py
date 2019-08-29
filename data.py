@@ -15,6 +15,7 @@ SeatIndex = 0
 NumericScore = 0
 SeatRank = 0 # a seat rank value of zero means no rank.
 UserToken = "example_token" # for now this is just the cookie
+PlayerGames = {"" : set([""])} # for now this is just a string -> [string] dictionary.
 GameScore = { "$seat_scores": [NumericScore],
               "$seat_ranks": [SeatRank], 
               "$winners": [SeatIndex],

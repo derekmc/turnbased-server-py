@@ -35,30 +35,66 @@ app = Bottle()
 @app.route('/')
 def index():
     get_session()
-    return template('templates/index')
+    return redirect('/opengames')
 
 @app.route('/static/<filepath:re:.*>', method="GET")
 def static_resource(filepath):
     return static_file(filepath, root="static")
 
-@app.route('/list')
-def games_list():
-    get_session()
-    game_infos = []
-    for game_id in data.games:
-        game_info = copy.deepcopy(data.games[game_id]['info'])
+def list_game_info_helper(games, game_filter):
+    game_info_list = []
+    for game_id, game in games.items():
+        # list games that aren't started
+        if not game_filter(game):
+            continue
+        game_info = copy.deepcopy(game['info'])
         game_info['id'] = game_id
-        game_infos.append(game_info)
-    return template('templates/list_games', game_list=game_infos)
+        game_info_list.append(game_info)
+    return game_info_list
+
+
+
+@app.route('/opengames')
+def open_games():
+    get_session()
+    game_info_list = list_game_info_helper(data.games,
+        lambda game: not game['status']['is_started'])
+    return template('templates/list_games', game_list=game_info_list, list_title="Open")
+
+
+
+@app.route('/activegames')
+def active_games():
+    get_session()
+    game_info_list = list_game_info_helper(data.games,
+        lambda game: game['status']['is_started'] and not game['status']['is_finished'])
+    return template('templates/list_games', game_list=game_info_list, list_title="Active")
+
+
 
 @app.route('/mygames')
 def my_games():
-    get_session()
-    #todo handler.my_games()
-    game_list = []
-    for game in data.games:
-        game_list.append(game)
-    return template('templates/my_games', game_list=json.dumps(game_list))
+    cookie = get_session()
+    player_game_set = T(data.PlayerGames, data.player_games).get(cookie, set())
+    player_game_dict = {}
+    for game_id in player_game_set:
+        player_game_dict[game_id] = data.games[game_id]
+
+    game_info_list = list_game_info_helper(player_game_dict,
+        lambda game: True)
+    return template('templates/list_games', game_list=game_info_list, list_title="My")
+    # game_infos = []
+    # for game_id in data.games:
+    #     game_info = copy.deepcopy(data.games[game_id]['info'])
+    #     game_info['id'] = game_id
+    #     game_infos.append(game_info)
+    # return template('templates/list_games', game_list=game_infos)
+    # get_session()
+    # #todo handler.my_games()
+    # game_list = []
+    # for game in data.games:
+    #     game_list.append(game)
+    # return template('templates/my_games', game_list=json.dumps(game_list), list_title="My")
 
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
@@ -195,6 +231,10 @@ def game_sit(id):
     }
     try:
         game = T(data.Game, data.games[id])
+        player_games = T(data.PlayerGames, data.player_games)
+        if not cookie in player_games:
+            player_games[cookie] = set()
+        player_games_set = player_games[cookie]
     except KeyError:
         error_data['destination'] = '/'
         # the id should be clean because it matches the id regex which only allows letters.
@@ -219,6 +259,7 @@ def game_sit(id):
                     return template('templates/error', **error_data)
                 else:
                     seats[seats.index(cookie)] = ""
+                    player_games_set.remove(id)
             else:
                 if sit_index == 0:
                     sit_index = 1
@@ -228,16 +269,15 @@ def game_sit(id):
                     error_data['error_message'] = "Could not sit. Only " + str(info['max_players']) + " allowed."
                     return template('templates/error', **error_data)
                 if len(seats) < sit_index:
+                    # fill in rest of blank seats
                     seats = seats + [""] * (sit_index - len(seats))
                     game['seats'] = seats
                 if seats[sit_index - 1] == "":
                     seats[sit_index - 1] = cookie
+                    player_games_set.add(id)
                 else:
                     error_data['error_message'] = "Could not sit. Seat " + str(sit_index) + " taken."
                     return template('templates/error', **error_data)
-                print("seats", seats)
-                    
-                error_message = "Could not sit. Seat may be taken or seats may be full."
 
     return redirect('/game/' + id + '/lobby')
 

@@ -4,6 +4,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--<meta http-equiv="refresh" content="10; url=/game/{{game_id}}/textplay" />-->
+    <link rel="stylesheet" type="text/css" href="/static/basic.css">
     <style>
      body{ max-width: 480px; margin: 0; padding: 1em 2em; font-family: sans-serif;}
 
@@ -15,7 +16,7 @@
     {{! nav_header }}
 
     <!-- START-SECTION: html -->
-      <h2> Turnbased Game Test </h2>
+      <h1> Turnbased Game Test </h1>
       <table>
       Paradigm: {{info['paradigm']}} <br>
       Version: {{info.get('version','')}} <br>

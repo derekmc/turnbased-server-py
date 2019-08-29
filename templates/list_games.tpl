@@ -6,7 +6,7 @@
   </head>
   <body>
     {{! nav_header }}
-    <h1> List Games </h1>
+    <h1> {{list_title}} Games </h1>
     <div id="main">
      
      <table>
