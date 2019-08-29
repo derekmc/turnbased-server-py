@@ -36,7 +36,7 @@ GameInfo = {
              #player stuff
              "min_players": 0,
              "max_players": 0,
-             # TODO "$live_seating": False,
+             "$live_seating": False,
              "$choose_seats": False, }
 
 Game = { "state": None,

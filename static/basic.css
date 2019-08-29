@@ -23,7 +23,8 @@ a:visited{ color: blue; }
 .nav a{ font-size: 88%; text-decoration: none; margin-right: 1em; color: #fff; font-weight: normal; }
 .nav a:visited{ color: #fff; }
 .error_message{
-   color: #000;
+   color: #fff;
+   font-weight: normal;
    background: #e44;
    border-radius: 0.5em;
    padding: 0.8em;

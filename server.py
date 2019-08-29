@@ -144,7 +144,6 @@ def game_lobby(id):
     if not id in data.games:
         return abort(404, "Unknown game id.")
     game = data.games[id]
-    info = game['info']
     error_message = None
     #if request.method == "POST":
     #    print(request.forms)
@@ -159,19 +158,26 @@ def game_lobby(id):
     info = game['info']
     seats = game['seats']
     status = game['status']
+    allow_seating = info.get('live_seating', False) or not status['is_started']   
+    seat_count = sum(x is not "" for x in seats)
     my_seat = 0
     for i in range(len(seats)):
         if seats[i] == cookie:
             my_seat = i + 1
+    can_start = my_seat > 0 and (not status['is_started']) and seat_count >= info.get('min_players', 0)
+    filtered_seats = ["x" if len(seat) else "" for seat in seats] 
+    print("seat count, min_seats, can_start", seat_count, info.get('min_players', 0), can_start)
             
     print("user 'my_seat'", my_seat)
     print("seats", seats)
 
     template_data = {
         "game_id" : id,
+        "can_start": can_start,
+        "allow_seating" : allow_seating,
         "info" : info,
         "status" : status,
-        "seats" : ["x" if len(seat) else "" for seat in seats],
+        "seats" : filtered_seats,
         "my_seat" : my_seat,
         "error_message" : error_message,
     }
@@ -198,34 +204,40 @@ def game_sit(id):
     print('game sit form', request.forms)
     info = game['info']
     seats = game['seats']
+    status = game['status']
+    allow_seating = info.get('live_seating', False) or not status['is_started']
     sit_index = int(request.forms.get("seat_index"))
-    if sit_index != None:
-        print("sitting:", sit_index)
-        if sit_index < 0:
-            if not cookie in seats:
-                error_data['error_message'] = "Could not stand. Perhaps you are not seated?"
-                return template('templates/error', **error_data)
+    if not allow_seating:
+        error_data['error_message'] = "Game started. Sitting or standing not allowed."
+        return template('templates/error', **error_data)
+    else:
+        if sit_index != None:
+            print("sitting:", sit_index)
+            if sit_index < 0:
+                if not cookie in seats:
+                    error_data['error_message'] = "Could not stand. Perhaps you are not seated?"
+                    return template('templates/error', **error_data)
+                else:
+                    seats[seats.index(cookie)] = ""
             else:
-                seats[seats.index(cookie)] = ""
-        else:
-            if sit_index == 0:
-                sit_index = 1
-                while sit_index - 1 < len(seats) and seats[sit_index - 1] != "":
-                    sit_index += 1
-            if sit_index > info['max_players']:
-                error_data['error_message'] = "Could not sit. Only " + str(info['max_players']) + " allowed."
-                return template('templates/error', **error_data)
-            if len(seats) < sit_index:
-                seats = seats + [""] * (sit_index - len(seats))
-                game['seats'] = seats
-            if seats[sit_index - 1] == "":
-                seats[sit_index - 1] = cookie
-            else:
-                error_data['error_message'] = "Could not sit. Seat " + str(sit_index) + " taken."
-                return template('templates/error', **error_data)
-            print("seats", seats)
-                
-            error_message = "Could not sit. Seat may be taken or seats may be full."
+                if sit_index == 0:
+                    sit_index = 1
+                    while sit_index - 1 < len(seats) and seats[sit_index - 1] != "":
+                        sit_index += 1
+                if sit_index > info['max_players']:
+                    error_data['error_message'] = "Could not sit. Only " + str(info['max_players']) + " allowed."
+                    return template('templates/error', **error_data)
+                if len(seats) < sit_index:
+                    seats = seats + [""] * (sit_index - len(seats))
+                    game['seats'] = seats
+                if seats[sit_index - 1] == "":
+                    seats[sit_index - 1] = cookie
+                else:
+                    error_data['error_message'] = "Could not sit. Seat " + str(sit_index) + " taken."
+                    return template('templates/error', **error_data)
+                print("seats", seats)
+                    
+                error_message = "Could not sit. Seat may be taken or seats may be full."
 
     return redirect('/game/' + id + '/lobby')
 

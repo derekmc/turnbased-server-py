@@ -41,17 +41,25 @@
             </td>
             <td>
               %if int(my_seat) == i+1:
-                <form method="POST" action="./sit">
-                  <input id="seat_index" name="seat_index" type="hidden" value="-1"/>
-                  <input type="submit" value="Stand"> </input>
-                </form>
+                  %if allow_seating:
+                    <form method="POST" action="./sit">
+                      <input id="seat_index" name="seat_index" type="hidden" value="-1"/>
+                      <input type="submit" value="Stand"> </input>
+                    </form>
+                  %else:
+                    Seated
+                  %end
               %elif i < len(seats) and seats[i] != "":
                 Player {{i+1}}
               %elif my_seat == 0 and info.get('choose_seats',True):
-                <form method="POST" action="./sit">
-                  <input id="seat_index" name="seat_index" type="hidden" value="{{i+1}}"/>
-                  <input type="submit" value="Sit"> </input>
-                </form>
+                %if allow_seating:
+                  <form method="POST" action="./sit">
+                    <input id="seat_index" name="seat_index" type="hidden" value="{{i+1}}"/>
+                    <input type="submit" value="Sit"> </input>
+                  </form>
+                %else:
+                  -
+                %end
               %else:
                 -
               %end
@@ -69,12 +77,26 @@
         <tr>
           <td colspan=2>
             %if my_seat == 0:
-              <button disabled> Enter Game </button>
-              <a href="./textplay"><button> Spectate Game </button></a>
-            %else:
-              <a href="./textplay"><button>
+              <button disabled>
                 {{!"Enter" if status["is_started"] else "Start"}} Game
-              </button></a>
+              </button>
+              %if status["is_started"]:
+                <a href="./textplay"><button> Spectate Game </button></a>
+              %else:
+                <button disabled> Spectate Game </button>
+              %end
+            %else:
+              %if status["is_started"]:
+                <a href="./textplay"><button>
+                  Enter Game
+                </button></a>
+              %elif can_start:
+                <a href="./textplay"><button>
+                  Start Game
+                </button></a>
+              %else:
+                <button disabled> Start Game </button>
+              %end
               <button disabled> Spectate Game </button>
             %end
           </td>

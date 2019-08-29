@@ -1,1 +1,1 @@
-html forms instead of client pages
+refresh button, and gray out "stale" page, except for refresh button, after a timeout, unless it's the current players active move.  (perhaps we auto refresh a few times in active games).
