@@ -150,11 +150,16 @@ def games_new_page():
 
     game_id = util.gen_token(settings.GAME_ID_LEN)
 
-    game = {"state": None,
-            "info": copy.deepcopy(game_args),
-            "status": {"is_started": False, "is_finished": False},
-            "chat": "",
-            "seats": []}
+    game = T(data.Game, {
+        "state": None,
+        "info": copy.deepcopy(game_args),
+        "status": {
+            "is_started": False,
+            "is_finished": False,
+            "turn_count": 0},
+        "chat": "",
+        "seats": []
+    })
     data.games[game_id] = game
 
     return redirect('/game/' + game_id + '/lobby')
@@ -302,6 +307,13 @@ def game_play_text(id):
     seats = game['seats']
     my_seat = 0
     player_count = 0
+    enforce_turns = info.get("enforce_turns", True)
+    turn_sequence = None
+    if "turn_sequence" in info:
+        turn_sequence = info["turn_sequence"]
+        enforce_turns = True
+    turn_count = status["turn_count"]
+
     for i in range(len(seats)):
         if len(seats[i]):
             player_count += 1
@@ -340,12 +352,33 @@ def game_play_text(id):
     print(game)
     game_text = view(game['state'])
 
+    my_turn = True
+    # if turn order is not enforced, turn_index is meaningless.
+    turn_index = None
+    if enforce_turns:
+        turn_remainder = turn_count % player_count
+        turn_index = turn_remainder + 1
+        if turn_sequence is not None:
+            # if the turn sequence is less than the number of players, some won't ever get to move!
+            if turn_remainder >= len(turn_sequence):
+                print("Warning: turn sequence is less than player count.")
+                turn_remainder = turn_count % len(turn_sequence)
+            turn_index = turn_sequence[turn_remainder]
+        if turn_index == my_seat:
+            my_turn = True
+        else:
+            my_turn = False
+
+
     template_data = {
         "game_id" : id,
+        "info" : info,
         "game_text" : game_text,
         "seats" : ["x" if len(seat) else "" for seat in seats],
         "my_seat" : my_seat,
-        "info" : info,
+        "my_turn" : my_turn,
+        "turn_index" : turn_index,
+        "turn_count" : turn_count,
     }
 
     return template('templates/text_game', **template_data)

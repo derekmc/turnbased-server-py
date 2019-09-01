@@ -24,13 +24,15 @@ GameScore = { "$seat_scores": [NumericScore],
 
 GameStatus = { "is_started": False,
                "is_finished": False,
+               "turn_count": 0,
                "$score": GameScore}
 
 GameInfo = {
              "paradigm": "",
              "$version": "",
              # configuration and turn stuff
-             "$turn_sequence": [0],
+             "$enforce_turn_sequence": True, # if there is a turn sequence, this is ignored and assumed to be true.  Also defaults to true if left blank.
+             "$turn_sequence": [0], 
              "$initial_time": 0, # total starting time
              "$turn_time": 0, # fixed amount of time per turn
              "$turn_time_increment": 0, # time added to total time each turn.

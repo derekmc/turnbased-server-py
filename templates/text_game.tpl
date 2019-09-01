@@ -20,7 +20,8 @@
       <table>
       Paradigm: {{info['paradigm']}} <br>
       Version: {{info.get('version','')}} <br>
-      Turn: <br>
+      Current Turn: {{turn_index}}<br>
+      Total Turns: {{turn_count}}<br>
       
       <pre>{{ game_text }}</pre>
       <form>
