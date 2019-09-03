@@ -17,12 +17,18 @@
 
     <!-- START-SECTION: html -->
       <h1> Turnbased Game Test </h1>
-      <table>
-      Paradigm: {{info['paradigm']}} <br>
-      Version: {{info.get('version','')}} <br>
-      Current Turn: {{turn_index}}<br>
-      Total Turns: {{turn_count}}<br>
 
+      <table>
+        <tr><th>Paradigm</th><td>{{info['paradigm']}}</td>
+            <th>Version</th><td>{{info.get('version','')}}</td></tr>
+        <tr><th>Current Turn</th><td>{{turn_index}}</td>
+            <th>Total Turns</th><td>{{turn_count}}</td></tr>
+      </table>
+      <br>
+      <a href="./textplay">Refresh Game</a><br>
+
+
+      <hr>
       %if my_turn:
         %if move_list:
           %for move in move_list:
@@ -38,7 +44,6 @@
           </form>
         %end
       %end
-      <hr>
       <pre>{{ game_text }}</pre>
 
       <hr>

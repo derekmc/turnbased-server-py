@@ -329,6 +329,28 @@ def game_play_text(id):
         turn_sequence = info["turn_sequence"]
         enforce_turns = True
     turn_count = status["turn_count"]
+    my_turn = True
+    turn_index = None # if turn order is not enforced, turn_index is meaningless.
+    turn_count = status['turn_count']
+    def process_turn_info():
+        nonlocal my_turn
+        nonlocal turn_count
+        nonlocal turn_index
+        my_turn = True
+        turn_count = status['turn_count']
+        if enforce_turns:
+            turn_remainder = turn_count % player_count
+            turn_index = turn_remainder + 1
+            if turn_sequence is not None:
+                # if the turn sequence is less than the number of players, some won't ever get to move!
+                if turn_remainder >= len(turn_sequence):
+                    print("Warning: turn sequence is less than player count.")
+                    turn_remainder = turn_count % len(turn_sequence)
+                turn_index = turn_sequence[turn_remainder]
+            if turn_index == my_seat:
+                my_turn = True
+            else:
+                my_turn = False
 
     for i in range(len(seats)):
         if len(seats[i]):
@@ -361,22 +383,8 @@ def game_play_text(id):
 
 
 
-    my_turn = True
-    # if turn order is not enforced, turn_index is meaningless.
-    turn_index = None
-    if enforce_turns:
-        turn_remainder = turn_count % player_count
-        turn_index = turn_remainder + 1
-        if turn_sequence is not None:
-            # if the turn sequence is less than the number of players, some won't ever get to move!
-            if turn_remainder >= len(turn_sequence):
-                print("Warning: turn sequence is less than player count.")
-                turn_remainder = turn_count % len(turn_sequence)
-            turn_index = turn_sequence[turn_remainder]
-        if turn_index == my_seat:
-            my_turn = True
-        else:
-            my_turn = False
+
+    process_turn_info()
 
     if not hasattr(paradigm, 'text_handler'):
         error_data['error_message'] = "Game has no text handler, cannot play in text mode."
@@ -410,10 +418,12 @@ def game_play_text(id):
 
         updated_game_state = paradigm.update(game_state, move, my_seat)
         game['state'] = updated_game_state
+        game['status']['turn_count'] += 1
         score_result = paradigm.score(updated_game_state,)
         game['status']['score'] = score_result
-        if score_result.get("finished", False):
-            game['status']['is_finished'] = true
+        if score_result.get("game_over", False):
+            game['status']['is_finished'] = True
+        process_turn_info()
 
     view = text_handler['view']
     game_text = view(game['state'])

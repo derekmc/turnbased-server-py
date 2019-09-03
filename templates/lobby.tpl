@@ -8,7 +8,7 @@
       var my_seat = "{{ my_seat }}"
       window.addEventListener("load", init);
       function init(){
-          
+
       }
       /*
       function sit(seat){
@@ -27,7 +27,7 @@
     {{! nav_header }}
     <h1> Game Lobby "{{ game_id }}"</h1>
     Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
-      <table style="min-width: 240px;">
+      <table class="listtable" style="min-width: 240px;">
         <tr><th> Seat </th> <th> Player </th></tr>
         %for i in range(int(info['max_players'])):
           <tr>

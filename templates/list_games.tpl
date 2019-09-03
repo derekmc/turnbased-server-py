@@ -9,7 +9,7 @@
     <h1> {{list_title}} Games </h1>
     <div id="main">
 
-     <table>
+     <table class="listtable">
       %for game in game_list:
        <tr><td><a href='/game/{{game['id']}}/lobby'>{{game['id']}}</a></td>
            <td>{{game['paradigm']}}</td>

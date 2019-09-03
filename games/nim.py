@@ -29,7 +29,7 @@ def __turn_seat(turn, seats=2):
     return (turn - 1)%seats + 1
 
 text_handler = {
-   "view" : lambda data: "O " * data['stones'],
+   "view" : lambda data: str(data['stones']) + " stones remain.",
    "moves" : lambda data: ["1"] if data["stones"] == 1 else ["1", "2"],
    "parseMove" : lambda move_text: {"take": int(move_text)},
 }
@@ -82,5 +82,5 @@ def score(data, seat=0):
     stones = data['stones']
     turn = data['turn']
     if stones <= 0:
-        return {'winners': __turn_seat(turn), 'finished': True}
+        return {'winners': [__turn_seat(turn)], 'game_over': True}
     return {}
