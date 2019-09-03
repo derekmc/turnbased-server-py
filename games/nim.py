@@ -28,6 +28,11 @@ NimInitSchema = {
 def __turn_seat(turn, seats=2):
     return (turn - 1)%seats + 1
 
+text_handler = {
+   "view" : lambda data: "O " * data['stones'],
+   "parseMove" : lambda x: int(x),
+}
+
 info = {
   "paradigm": "Nim",
   "version" : 'dev',
