@@ -45,9 +45,10 @@ def init(init_args):
     }
     if init_args:
         validate(init_args, NimInitSchema)
-        data['stones'] = init_args['stones']
+        if 'stones' in init_args:
+            data['stones'] = init_args['stones']
     return data
-    
+
 
 def verify(data, move, seat):
     validate(data, NimStateSchema);
@@ -76,5 +77,3 @@ def score(data, seat=0):
     if stones <= 0:
         return {'winners': __turn_seat(turn), 'finished': True}
     return {}
-
-

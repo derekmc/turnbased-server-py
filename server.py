@@ -44,12 +44,26 @@ def static_resource(filepath):
 def list_game_info_helper(games, game_filter):
     game_info_list = []
     for game_id, game in games.items():
-        # list games that aren't started
-        if not game_filter(game):
-            continue
+        status = game['status']
         game_info = copy.deepcopy(game['info'])
         game_info['id'] = game_id
+        play_state = ""
+        if status['is_started']:
+            if status['is_finished']:
+                play_state = "Finished"
+            else:
+                play_state = "Active"
+        else:
+            if status['is_finished']:
+                play_state = "Aborted"
+            else:
+                play_state = "Open"
+        game_info['play_state'] = play_state
+        # filter the game list
+        if not game_filter(game_info):
+            continue
         game_info_list.append(game_info)
+    game_info_list.sort(key=lambda x: {"Open":0, "Active": 1, "Finished": 2, "Aborted": 3}[x['play_state']])
     return game_info_list
 
 
@@ -58,7 +72,7 @@ def list_game_info_helper(games, game_filter):
 def open_games():
     get_session()
     game_info_list = list_game_info_helper(data.games,
-        lambda game: not game['status']['is_started'])
+        lambda game: game['play_state'] == "Open")
     return template('templates/list_games', game_list=game_info_list, list_title="Open")
 
 
@@ -67,7 +81,7 @@ def open_games():
 def active_games():
     get_session()
     game_info_list = list_game_info_helper(data.games,
-        lambda game: game['status']['is_started'] and not game['status']['is_finished'])
+        lambda game: game['play_state'] == "Active")
     return template('templates/list_games', game_list=game_info_list, list_title="Active")
 
 
@@ -116,7 +130,7 @@ def games_new_page():
     max_players = int(request.forms.get('max_players'))
     choose_seats = request.forms.get('choose_seats') == 'on'
 
-    
+
     if paradigm == None:
         raise ValueError('new_game: no paradigm attribute')
     try:
@@ -133,14 +147,14 @@ def games_new_page():
         min_players = info_min_players
     if max_players == "" or max_players > info_max_players:
         max_players = info_max_players
-        
+
     game_args = {
         'paradigm': paradigm,
         'min_players': min_players,
         'max_players': max_players,
         'choose_seats': choose_seats,
     }
-    
+
     # TODO handle initial state when first move is made.
     #init_state = {}
     #if hasattr(game_handler, "init"):
@@ -199,16 +213,16 @@ def game_lobby(id):
     info = game['info']
     seats = game['seats']
     status = game['status']
-    allow_seating = info.get('live_seating', False) or not status['is_started']   
+    allow_seating = info.get('live_seating', False) or not status['is_started']
     seat_count = sum(x is not "" for x in seats)
     my_seat = 0
     for i in range(len(seats)):
         if seats[i] == cookie:
             my_seat = i + 1
     can_start = my_seat > 0 and (not status['is_started']) and seat_count >= info.get('min_players', 0)
-    filtered_seats = ["x" if len(seat) else "" for seat in seats] 
+    filtered_seats = ["x" if len(seat) else "" for seat in seats]
     print("seat count, min_seats, can_start", seat_count, info.get('min_players', 0), can_start)
-            
+
     print("user 'my_seat'", my_seat)
     print("seats", seats)
 
@@ -344,6 +358,11 @@ def game_play_text(id):
         status['is_started'] = True
 
 
+    if not hasattr(paradigm, 'text_handler'):
+        error_data['error_message'] = "Game has no text handler, cannot play in text mode."
+        error_data['destination'] = "/game/" + id + "/lobby"
+        return template('templates/error', **error_data)
+
     text_handler = paradigm.text_handler
     view = text_handler['view']
     # TODO handle post request
@@ -403,7 +422,5 @@ def game_move():
 if __name__ == "__main__":
     with open(settings.NAV_FILE) as file:
         BaseTemplate.defaults['nav_header'] = file.read()
-    app.run(debug=True, server='waitress')
+    app.run(debug=True, port=8000, server='waitress')
     #app.run(debug=False)
-
-
