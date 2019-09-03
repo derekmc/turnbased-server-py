@@ -300,7 +300,8 @@ def game_sit(id):
 
     return redirect('/game/' + id + '/lobby')
 
-@app.route('/game/<id:re:[a-zA-Z]*>/textplay')
+@app.route('/game/<id:re:[a-zA-Z]*>/textplay', method="POST")
+@app.route('/game/<id:re:[a-zA-Z]*>/textplay', method="GET")
 def game_play_text(id):
     print("'Game Play Text' called.")
     cookie = get_session()
@@ -319,9 +320,10 @@ def game_play_text(id):
     info = game['info']
     status = game['status']
     seats = game['seats']
+    game_state = game['state']
     my_seat = 0
     player_count = 0
-    enforce_turns = info.get("enforce_turns", True)
+    enforce_turns = info.get("enforce_turn_sequence", True)
     turn_sequence = None
     if "turn_sequence" in info:
         turn_sequence = info["turn_sequence"]
@@ -358,18 +360,6 @@ def game_play_text(id):
         status['is_started'] = True
 
 
-    if not hasattr(paradigm, 'text_handler'):
-        error_data['error_message'] = "Game has no text handler, cannot play in text mode."
-        error_data['destination'] = "/game/" + id + "/lobby"
-        return template('templates/error', **error_data)
-
-    text_handler = paradigm.text_handler
-    view = text_handler['view']
-    # TODO handle post request
-    # parseMove = text_handler['parseMove']
-    # move = parseMove(
-    print(game)
-    game_text = view(game['state'])
 
     my_turn = True
     # if turn order is not enforced, turn_index is meaningless.
@@ -388,11 +378,57 @@ def game_play_text(id):
         else:
             my_turn = False
 
+    if not hasattr(paradigm, 'text_handler'):
+        error_data['error_message'] = "Game has no text handler, cannot play in text mode."
+        error_data['destination'] = "/game/" + id + "/lobby"
+        return template('templates/error', **error_data)
+
+    text_handler = T(data.TextHandler, paradigm.text_handler)
+
+    # TODO handle post request
+    if request.method == "POST":
+        if not my_turn:
+            error_data['error_message'] = "" + game['info']['paradigm'] + ": Not your turn."
+            error_data['destination'] = "/game/" + id + "/textplay"
+            return template('templates/error', **error_data)
+
+        parseMove = text_handler['parseMove']
+        print(request.forms)
+        move_text = request.forms.get("move_text")
+        try:
+            move = parseMove(move_text)
+        except Exception as e:
+            print("error while parsing text move: " + str(e))
+            error_data['error_message'] = "" + game['info']['paradigm'] + ": Could not parse text move '" + text_move + "'"
+            error_data['destination'] = "/game/" + id + "/textplay"
+            return template('templates/error', **error_data)
+
+        if not paradigm.verify(game_state, move, my_seat):
+            error_data['error_message'] = "" + game['info']['paradigm'] + ": Not a legal move '" + text_move + "'"
+            error_data['destination'] = "/game/" + id + "/textplay"
+            return template('templates/error', **error_data)
+
+        updated_game_state = paradigm.update(game_state, move, my_seat)
+        game['state'] = updated_game_state
+        score_result = paradigm.score(updated_game_state,)
+        game['status']['score'] = score_result
+        if score_result.get("finished", False):
+            game['status']['is_finished'] = true
+
+    view = text_handler['view']
+    game_text = view(game['state'])
+    # print(game_text)
+    move_list = None
+    if "moves" in text_handler:
+        move_list = text_handler['moves'](game['state'])
+
+    print("move_list", move_list)
 
     template_data = {
         "game_id" : id,
         "info" : info,
         "game_text" : game_text,
+        "move_list" : move_list,
         "seats" : ["x" if len(seat) else "" for seat in seats],
         "my_seat" : my_seat,
         "my_turn" : my_turn,

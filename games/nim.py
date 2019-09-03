@@ -30,13 +30,15 @@ def __turn_seat(turn, seats=2):
 
 text_handler = {
    "view" : lambda data: "O " * data['stones'],
-   "parseMove" : lambda x: int(x),
+   "moves" : lambda data: ["1"] if data["stones"] == 1 else ["1", "2"],
+   "parseMove" : lambda move_text: {"take": int(move_text)},
 }
 
 info = {
   "paradigm": "Nim",
   "version" : 'dev',
-  #"live_seating" : False,
+  "enforce_turn_sequence" : True,
+  "live_seating" : False,
   "min_players": 2,
   "max_players": 2,
 }

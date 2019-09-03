@@ -17,9 +17,9 @@ SeatRank = 0 # a seat rank value of zero means no rank.
 UserToken = "example_token" # for now this is just the cookie
 PlayerGames = {"" : set([""])} # for now this is just a string -> [string] dictionary.
 GameScore = { "$seat_scores": [NumericScore],
-              "$seat_ranks": [SeatRank], 
+              "$seat_ranks": [SeatRank],
               "$winners": [SeatIndex],
-              "$losers": [SeatIndex], 
+              "$losers": [SeatIndex],
               "$game_over": False,}
 
 GameStatus = { "is_started": False,
@@ -32,7 +32,7 @@ GameInfo = {
              "$version": "",
              # configuration and turn stuff
              "$enforce_turn_sequence": True, # if there is a turn sequence, this is ignored and assumed to be true.  Also defaults to true if left blank.
-             "$turn_sequence": [0], 
+             "$turn_sequence": [0],
              "$initial_time": 0, # total starting time
              "$turn_time": 0, # fixed amount of time per turn
              "$turn_time_increment": 0, # time added to total time each turn.
@@ -41,6 +41,11 @@ GameInfo = {
              "max_players": 0,
              "$live_seating": False,
              "$choose_seats": False, }
+TextHandler = {
+    "parseMove" : None, # currently valuetypes does not handle functions
+    "view" : None,
+    "$moves" : None, # optional function computing legal moves
+}
 
 Game = { "state": None,
          "info": GameInfo,

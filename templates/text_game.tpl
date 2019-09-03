@@ -22,20 +22,33 @@
       Version: {{info.get('version','')}} <br>
       Current Turn: {{turn_index}}<br>
       Total Turns: {{turn_count}}<br>
-      
+
+      %if my_turn:
+        %if move_list:
+          %for move in move_list:
+            <form method="POST">
+              <input type="hidden" name="move_text" value="{{move}}">
+              <input type="submit" value="{{move}}"/>
+            </form>
+          %end
+        %else:
+          <form method="POST">
+            <input name="move_text" type="text" title="(example: (example_move goes here))">
+            <input type="submit" value="Submit"/>
+          </form>
+        %end
+      %end
+      <hr>
       <pre>{{ game_text }}</pre>
-      <form>
-        <!--input name="move_text" type="text" title="(example: e2 e4)">
-        <input type="submit" value="Submit"/-->
-      </form>
-      
-      <p>This is a text-based testing interface for turnbased games.
+
+      <hr>
+      <small>
+      <p>This is a text-based interface for turnbased games.
          If it's your turn, there will be a box above to enter your move,
-         otherwise, the page will automatically refresh until it's your turn.
+         otherwise, refresh the page until it's your turn.
       </p>
-      
-      <p> Example move: <b></b></p>
+    </small>
+
     <!-- END-SECTION: html -->
   </body>
 </html>
-
