@@ -1,29 +1,29 @@
 
 import json
-try:
-    from jsonschema import validate
-except:
-    print("jsonschema not available, no validation will be performed.")
-    validate = lambda x,y: True
-
-NimStateSchema = {
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "turn": {"type": "integer"},
-        "stones": {"type": "integer"}}}
-
-NimMoveSchema = {
-    "type": "object",
-    "additionalProperties": False,
-    "properties" : {
-      "take" : {"type": "integer"}}}
-
-NimInitSchema = {
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "stones": {"type": "integer"}}}
+# try:
+#     from jsonschema import validate
+# except:
+#     print("jsonschema not available, no validation will be performed.")
+#     validate = lambda x,y: True
+# 
+# NimStateSchema = {
+#     "type": "object",
+#     "additionalProperties": False,
+#     "properties": {
+#         "turn": {"type": "integer"},
+#         "stones": {"type": "integer"}}}
+# 
+# NimMoveSchema = {
+#     "type": "object",
+#     "additionalProperties": False,
+#     "properties" : {
+#       "take" : {"type": "integer"}}}
+# 
+# NimInitSchema = {
+#     "type": "object",
+#     "additionalProperties": False,
+#     "properties": {
+#         "stones": {"type": "integer"}}}
 
 def __turn_seat(turn, seats=2):
     return (turn - 1)%seats + 1
@@ -51,15 +51,15 @@ def init(init_args):
         'stones': 10
     }
     if init_args:
-        validate(init_args, NimInitSchema)
+        #validate(init_args, NimInitSchema)
         if 'stones' in init_args:
             data['stones'] = init_args['stones']
     return data
 
 
 def verify(data, move, seat):
-    validate(data, NimStateSchema);
-    validate(move, NimMoveSchema);
+    # validate(data, NimStateSchema);
+    # validate(move, NimMoveSchema);
     stones = data['stones']
     turn = data['turn']
     take = move['take']

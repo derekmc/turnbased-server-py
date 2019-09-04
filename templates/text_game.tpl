@@ -3,19 +3,37 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--<meta http-equiv="refresh" content="10; url=/game/{{game_id}}/textplay" />-->
+    %if not my_turn:
+       <!-- <meta http-equiv="refresh" content="15; url=/game/{{game_id}}/textplay" />-->
+    %end
     <link rel="stylesheet" type="text/css" href="/static/basic.css">
     <style>
      body{ max-width: 480px; margin: 0; padding: 1em 2em; font-family: sans-serif;}
 
      * { }
     </style>
+    <script>
+      var EXPIRE_TIME = 15*1000;
+      function blurPage(){
+        document.body.classList.add("blurred");
+      }
+      function init(){
+        %if not my_turn:
+          setTimeout(blurPage, EXPIRE_TIME);
+        %end
+      }
+      window.addEventListener("load", init);
+    </script>
   </head>
 
   <body>
     {{! nav_header }}
 
-    <!-- START-SECTION: html -->
+    <div class="overlay" onclick='location = location');">
+      <h2> Page Expired </h2>
+      <h3> Click to Refresh </h3>
+    </div>
+    <div class="main">
       <h1> Turnbased Game Test </h1>
 
       <table>
@@ -48,12 +66,11 @@
 
       <hr>
       <small>
-      <p>This is a text-based interface for turnbased games.
-         If it's your turn, there will be a box above to enter your move,
-         otherwise, refresh the page until it's your turn.
-      </p>
-    </small>
-
-    <!-- END-SECTION: html -->
+        <p>This is a text-based interface for turnbased games.
+           If it's your turn, there will be a box above to enter your move,
+           otherwise, refresh the page until it's your turn.
+        </p>
+      </small>
+    </div>
   </body>
 </html>

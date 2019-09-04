@@ -2,14 +2,19 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta http-equiv="refresh" content="20; url=/game/{{game_id}}/lobby" /> -->
     <link rel="stylesheet" type="text/css" href="/static/basic.css">
     <script>
+      var EXPIRE_TIME = 15*1000;
       var game_id = "{{ game_id }}"
       var my_seat = "{{ my_seat }}"
-      window.addEventListener("load", init);
-      function init(){
-
+      function blurPage(){
+        document.body.classList.add("blurred");
       }
+      function init(){
+        setTimeout(blurPage, EXPIRE_TIME);
+      }
+      window.addEventListener("load", init);
       /*
       function sit(seat){
         var sit_index_input = document.getElementById('sit_index');
@@ -23,10 +28,15 @@
 
     </script>
   </head>
-  <body>
+  <body class="hide">
     {{! nav_header }}
-    <h1> Game Lobby "{{ game_id }}"</h1>
-    Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
+    <div class="overlay" onclick="location = location;">
+      <h2> Page Expired </h2>
+      <h3> Click to Refresh </h3>
+    </div>
+    <div class="main">
+      <h1> Game Lobby "{{ game_id }}"</h1>
+      Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
       <table class="listtable" style="min-width: 240px;">
         <tr><th> Seat </th> <th> Player </th></tr>
         %for i in range(int(info['max_players'])):
@@ -109,6 +119,6 @@
         <tr><td> 4 </td> <td><button> Stand </button></td></tr>
         <tr><td colspan=2><button> Take Next Seat </button> <button> Enter Game</button></td></tr-->
       </table>
-      <br>
+    </div>
   </body>
 </html>

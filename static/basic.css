@@ -19,7 +19,7 @@ a:visited{ color: blue; }
 
 .nav { position: absolute; display: block;
        top: 0; left: 0; right: 0;
-       margin: 0; padding: 10px 18px; background: black; }
+       margin: 0; padding: 10px 18px; background: black; z-index: 100;}
 .nav a{ font-size: 88%; text-decoration: none; margin-right: 1em; color: #fff; font-weight: normal; }
 .nav a:visited{ color: #fff; }
 .error_message{
@@ -37,10 +37,39 @@ a:visited{ color: blue; }
     color: red;
     border-radius: 0.45em;
 }
+
+body.blurred{
+  display: table;
+  overflow: hidden;
+}
+body.blurred .nav{
+  filter: blur(3px);
+}
+body.blurred .main{
+  filter: blur(3px);
+}
+body .overlay {
+   display: none;
+}
+body.blurred .overlay {
+  padding-top: 25%;
+  color: white;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  position: absolute;
+  z-index: 150;
+  display: block;
+  top: 0; bottom: 0; left: 0; right: 0;
+  background: rgba(128,128,164,0.6);
+}
+
 form{
   display: inline-block;
 }
 
 input[type=submit], button{
     font-size:116%; text-transform: uppercase;
-    font-family: monospace; font-weight: bold; }
+    font-family: monospace; font-weight: bold;
+}
+
