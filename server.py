@@ -340,13 +340,22 @@ def game_play_text(id):
         turn_count = status['turn_count']
         if enforce_turns:
             turn_remainder = turn_count % player_count
-            turn_index = turn_remainder + 1
+            # the turn index may only correspond with filled seats.
+            turn_index = 0
+            while turn_remainder >= 0:
+                turn_index += 1
+                if turn_index > len(seats):
+                    error_data['error_message'] = "Server error processing current turn."
+                    error_data['destination'] = "/game/" + id + "/lobby"
+                    return template('templates/error', **error_data)
+                if len(seats[turn_index - 1]) > 0:
+                    turn_remainder -= 1
             if turn_sequence is not None:
                 # if the turn sequence is less than the number of players, some won't ever get to move!
                 if turn_remainder >= len(turn_sequence):
                     print("Warning: turn sequence is less than player count.")
                     turn_remainder = turn_count % len(turn_sequence)
-                turn_index = turn_sequence[turn_remainder]
+                turn_index = turn_sequence[turn_index - 1]
             if turn_index == my_seat:
                 my_turn = True
             else:
