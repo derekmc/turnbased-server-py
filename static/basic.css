@@ -52,7 +52,7 @@ body .overlay {
    display: none;
 }
 body.blurred .overlay {
-  padding-top: 25%;
+  padding-top: 15%;
   color: white;
   text-align: center;
   display: table-cell;

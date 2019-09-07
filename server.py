@@ -25,7 +25,8 @@ def get_session():
     # check if cookie is exists
     if cookie and cookie in data.cookies:
         return cookie
-    cookie = util.gen_token(settings.COOKIE_LEN, chars=string.ascii_letters.upper())
+    cookie = util.gen_token(settings.COOKIE_LEN, tries=settings.GEN_ID_TRIES,
+                            taken=data.cookies, chars=string.ascii_letters.upper())
     response.set_cookie(settings.COOKIE_NAME, cookie)
     data.cookies.add(cookie)
     return cookie
