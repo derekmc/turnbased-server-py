@@ -1,36 +1,16 @@
 
-import json
-# try:
-#     from jsonschema import validate
-# except:
-#     print("jsonschema not available, no validation will be performed.")
-#     validate = lambda x,y: True
-# 
-# NimStateSchema = {
-#     "type": "object",
-#     "additionalProperties": False,
-#     "properties": {
-#         "turn": {"type": "integer"},
-#         "stones": {"type": "integer"}}}
-# 
-# NimMoveSchema = {
-#     "type": "object",
-#     "additionalProperties": False,
-#     "properties" : {
-#       "take" : {"type": "integer"}}}
-# 
-# NimInitSchema = {
-#     "type": "object",
-#     "additionalProperties": False,
-#     "properties": {
-#         "stones": {"type": "integer"}}}
+from value_types import typecheck as T
+
+NimMove = {"take": 0}
+NimInit = {"$stones": 0}
+NimState = {"turn": 0, "stones": 0}
 
 def __turn_seat(turn, seats=2):
     return (turn - 1)%seats + 1
 
 text_handler = {
-   "view" : lambda data: str(data['stones']) + " stones remain.",
-   "moves" : lambda data: ["1"] if data["stones"] == 1 else ["1", "2"],
+   "view" : lambda state: str(state['stones']) + " stones remain.",
+   "moves" : lambda state: ["1"] if state["stones"] == 1 else ["1", "2"],
    "parseMove" : lambda move_text: {"take": int(move_text)},
 }
 
@@ -46,22 +26,24 @@ info = {
 
 
 def init(init_args):
-    data = {
+    state = {
         'turn': 1,
         'stones': 10
     }
     if init_args:
         #validate(init_args, NimInitSchema)
         if 'stones' in init_args:
-            data['stones'] = init_args['stones']
-    return data
+            state['stones'] = init_args['stones']
+    return state
 
 
-def verify(data, move, seat):
-    # validate(data, NimStateSchema);
+def verify(state, move, seat):
+    T(NimState, state);
+    T(NimMove, move);
+    # validate(state, NimStateSchema);
     # validate(move, NimMoveSchema);
-    stones = data['stones']
-    turn = data['turn']
+    stones = state['stones']
+    turn = state['turn']
     take = move['take']
     assert take == 1 or take == 2,  "must take 1 or 2 stones"
     assert take <= stones,          "cannot take " + take + " stones, only " + stones + " remain(s)."
@@ -70,17 +52,17 @@ def verify(data, move, seat):
     return True
     # print(state, move)
 
-def update(data, move, seat):
-    data['stones'] -= move['take']
-    data['turn'] += 1
-    return data
+def update(state, move, seat):
+    state['stones'] -= move['take']
+    state['turn'] += 1
+    return state
 
-def view(data, seat=0):
-    return data
+def view(state, seat=0):
+    return state
 
-def score(data, seat=0):
-    stones = data['stones']
-    turn = data['turn']
+def score(state, seat=0):
+    stones = state['stones']
+    turn = state['turn']
     if stones <= 0:
-        return {'winners': [__turn_seat(turn)], 'game_over': True}
+        return {'winners': [__turn_seat(turn)], 'losers': [__turn_seat(turn+1)], 'game_over': True}
     return {}
