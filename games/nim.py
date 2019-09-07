@@ -10,7 +10,7 @@ def __turn_seat(turn, seats=2):
 
 text_handler = {
    "view" : lambda state: str(state['stones']) + " stones remain.",
-   "moves" : lambda state: ["1"] if state["stones"] == 1 else ["1", "2"],
+   "moves" : lambda state: ["1", "2"][:max(0, min(2, state["stones"]))],
    "parseMove" : lambda move_text: {"take": int(move_text)},
 }
 
@@ -43,7 +43,7 @@ def verify(state, move, seat):
     stones = state['stones']
     turn = state['turn']
     take = move['take']
-    assert take == 1 and take == 2,  "must take 1 or 2 stones"
+    assert take == 1 or take == 2,  "must take 1 or 2 stones"
     assert take <= stones,          "cannot take " + take + " stones, only " + stones + " remain(s)."
     assert seat == 1 or seat == 2,  "only 2 seats allowed"
     assert seat == __turn_seat(turn), "not your turn"

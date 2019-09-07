@@ -34,19 +34,18 @@
       <h3> Click to Refresh </h3>
     </div>
     <div class="main">
-      <h1> Turnbased Game Test </h1>
-
-      <table>
-        <tr><th>Paradigm</th><td>{{info['paradigm']}}</td>
-            <th>Version</th><td>{{info.get('version','')}}</td></tr>
-        <tr><th>Current Turn</th><td>{{turn_index}}</td>
-            <th>Total Turns</th><td>{{turn_count}}</td></tr>
-      </table>
       <br>
-      <a href="./textplay">Refresh Game</a><br>
+      <h1> {{ game_name }} Text Play </h1>
+      %if len(info.get('version', '')):
+        <h3> Version {{info['version']}}</h3>
+      %end
 
+      <b>{{!"Your Move" if my_turn else "Player " + str(turn_index) + "'s Turn."}}</b>
+      <br>
+      %if not my_turn:
+        <a href="./textplay">Refresh</a>
+      %end
 
-      <hr>
       %if my_turn:
         %if move_list:
           %for move in move_list:
@@ -62,15 +61,17 @@
           </form>
         %end
       %end
-      <pre>{{ game_text }}</pre>
+      <span style="font-size: 160%; font-family: monospace;">
+        <pre>{{ game_text }}</pre>
+      </span>
 
       <hr>
-      <small>
+      <span style="font-size: 10pt;">
         <p>This is a text-based interface for turnbased games.
            If it's your turn, there will be a box above to enter your move,
            otherwise, refresh the page until it's your turn.
         </p>
-      </small>
+      </span>
     </div>
   </body>
 </html>

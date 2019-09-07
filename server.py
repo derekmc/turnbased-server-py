@@ -438,6 +438,7 @@ def game_play_text(id):
 
     template_data = {
         "game_id" : id,
+        "game_name" : info['paradigm'],
         "info" : info,
         "game_text" : game_text,
         "move_list" : move_list,
