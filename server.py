@@ -98,19 +98,6 @@ def my_games():
     game_info_list = list_game_info_helper(player_game_dict,
         lambda game: True)
     return template('templates/list_games', game_list=game_info_list, list_title="My")
-    # game_infos = []
-    # for game_id in data.games:
-    #     game_info = copy.deepcopy(data.games[game_id]['info'])
-    #     game_info['id'] = game_id
-    #     game_infos.append(game_info)
-    # return template('templates/list_games', game_list=game_infos)
-    # get_session()
-    # #todo handler.my_games()
-    # game_list = []
-    # for game in data.games:
-    #     game_list.append(game)
-    # return template('templates/my_games', game_list=json.dumps(game_list), list_title="My")
-
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/new', method='GET')
