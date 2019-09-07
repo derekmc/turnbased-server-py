@@ -40,17 +40,14 @@ def init(init_args):
 def verify(state, move, seat):
     T(NimState, state);
     T(NimMove, move);
-    # validate(state, NimStateSchema);
-    # validate(move, NimMoveSchema);
     stones = state['stones']
     turn = state['turn']
     take = move['take']
-    assert take == 1 or take == 2,  "must take 1 or 2 stones"
+    assert take == 1 and take == 2,  "must take 1 or 2 stones"
     assert take <= stones,          "cannot take " + take + " stones, only " + stones + " remain(s)."
     assert seat == 1 or seat == 2,  "only 2 seats allowed"
     assert seat == __turn_seat(turn), "not your turn"
     return True
-    # print(state, move)
 
 def update(state, move, seat):
     state['stones'] -= move['take']

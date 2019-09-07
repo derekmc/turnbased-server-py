@@ -404,12 +404,17 @@ def game_play_text(id):
             move = parseMove(move_text)
         except Exception as e:
             print("error while parsing text move: " + str(e))
-            error_data['error_message'] = "" + game['info']['paradigm'] + ": Could not parse text move '" + text_move + "'"
+            error_data['error_message'] = "" + game['info']['paradigm'] + ": Could not parse text move '" + move_text + "'"
             error_data['destination'] = "/game/" + id + "/textplay"
             return template('templates/error', **error_data)
 
-        if not paradigm.verify(game_state, move, my_seat):
-            error_data['error_message'] = "" + game['info']['paradigm'] + ": Not a legal move '" + text_move + "'"
+        try:
+            if not paradigm.verify(game_state, move, my_seat):
+                error_data['error_message'] = "" + game['info']['paradigm'] + ": \"" + move_text + "\" is not a legal move. "
+                error_data['destination'] = "/game/" + id + "/textplay"
+                return template('templates/error', **error_data)
+        except AssertionError as e:
+            error_data['error_message'] = "" + game['info']['paradigm'] + ": \"" + move_text + "\" is not a legal move. " + str(e)
             error_data['destination'] = "/game/" + id + "/textplay"
             return template('templates/error', **error_data)
 
