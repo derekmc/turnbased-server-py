@@ -23,8 +23,8 @@
          var name = id("game_paradigm").value;
          var paradigm = paradigms[name];
          if(!paradigm) return;
-         var min = paradigm.min_players;
-         var max = paradigm.max_players;
+         var min = paradigm.min_allowed_players;
+         var max = paradigm.max_allowed_players;
          id("min_players").min = min;
          id("min_players").max = max;
          id("min_players").value = min;

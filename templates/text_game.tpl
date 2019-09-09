@@ -41,7 +41,8 @@
       %end
 
       <b>{{!"Your Move" if my_turn else "Player " + str(turn_index) + "'s Turn."}}</b>
-      <br>
+      <br><br>
+
       %if not my_turn:
         <a href="./textplay">Refresh</a>
       %end

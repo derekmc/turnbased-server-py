@@ -17,7 +17,7 @@ from games import games
 game_paradigms = {}
 paradigm_info = {}
 for game in games:
-    paradigm_info[game.info['paradigm']] = T(data.GameInfo, game.info)
+    paradigm_info[game.info['paradigm']] = T(data.GameParadigmInfo, game.info)
     game_paradigms[game.info['paradigm']] = game
 
 def get_session():
@@ -63,9 +63,9 @@ def list_game_info_helper(games, game_filter):
         # filter the game list
         if not game_filter(game_info):
             continue
-        game_info_list.append(game_info)
+        game_info_list.append(T(data.GameListInfo, game_info))
     game_info_list.sort(key=lambda x: {"Open":0, "Active": 1, "Finished": 2, "Aborted": 3}[x['play_state']])
-    return game_info_list
+    return T([data.GameListInfo], game_info_list)
 
 
 
@@ -113,40 +113,48 @@ def games_new_page():
 @app.route('/new', method='POST')
 def games_new_page():
     get_session()
-    paradigm = request.forms.get('game_paradigm')
+    paradigm_name = request.forms.get('game_paradigm')
     min_players = int(request.forms.get('min_players'))
     max_players = int(request.forms.get('max_players'))
+    live_seating = request.forms.get('live_seating', 'off') == 'on'
     choose_seats = request.forms.get('choose_seats') == 'on'
+    enforce_turn_sequence = request.forms.get('enforce_turn_sequence', 'on') == 'on'
 
 
-    if paradigm == None:
+    if paradigm_name == None:
         raise ValueError('new_game: no paradigm attribute')
     try:
-        game_handler = game_paradigms[paradigm]
-        info = game_handler.info
+        game_paradigm_handler = game_paradigms[paradigm_name]
+        paradigm_info = game_paradigm_handler.info
     except KeyError:
         raise ValueError('new_game: unknown game paradigm: ' + paradigm)
 
     # check against paradigm allowed values.
-    info_max_players = info['max_players']
-    info_min_players = info['min_players']
+    paradigm_max_players = paradigm_info.get('max_allowed_players', 30)
+    paradigm_min_players = paradigm_info.get('min_allowed_players', 1)
 
-    if min_players == "" or min_players < info_min_players:
-        min_players = info_min_players
-    if max_players == "" or max_players > info_max_players:
-        max_players = info_max_players
+    if min_players == "" or min_players < paradigm_min_players:
+        min_players = paradigm_min_players
+    if max_players == "" or max_players > paradigm_max_players:
+        max_players = paradigm_max_players
 
     game_args = {
-        'paradigm': paradigm,
+        'paradigm': paradigm_name,
         'min_players': min_players,
         'max_players': max_players,
-        'choose_seats': choose_seats,
+        'choose_seats': paradigm_info.get('allow_choose_seats', True) and choose_seats,
+        'live_seating': paradigm_info.get('allow_live_seating', False) and live_seating,
+        'enforce_turn_sequence' : "default_turn_sequence" in paradigm_info or
+                                  paradigm_info.get('require_enforce_turn_sequence', True) or 
+                                  enforce_turn_sequence,
     }
 
-    # TODO handle initial state when first move is made.
-    #init_state = {}
-    #if hasattr(game_handler, "init"):
-    #    init_state = game_handler.init(game_args)
+    game_info = { **copy.deepcopy(paradigm_info), **game_args }
+
+    # init is handled when a player clicks start game.
+    # init_state = {}
+    # if hasattr(game_paradigm_handler, "init"):
+    #    init_state = game_paradigm_handler.init(game_args)
 
     print('game_args', game_args)
 
@@ -154,7 +162,7 @@ def games_new_page():
 
     game = T(data.Game, {
         "state": None,
-        "info": copy.deepcopy(game_args),
+        "info": game_info,
         "status": {
             "is_started": False,
             "is_finished": False,

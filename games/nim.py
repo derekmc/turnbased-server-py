@@ -17,10 +17,9 @@ text_handler = {
 info = {
   "paradigm": "Nim",
   "version" : 'dev',
-  "enforce_turn_sequence" : True,
-  "live_seating" : False,
-  "min_players": 2,
-  "max_players": 2,
+  "require_enforce_turn_sequence" : True,
+  "min_allowed_players": 2,
+  "max_allowed_players": 2,
 }
 
 

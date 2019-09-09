@@ -2,11 +2,12 @@
 info = {
     "paradigm": "Chinese Checkers",
     "version": "dev",
-    "live_seating": False,
+    "allow_live_seating": False,
     # TODO make sure turns go around the board counter clockwise, instead of in 
-    "turn_sequence": [1, 4, 5, 2, 3, 6],
-    "min_players": 2,
-    "max_players": 6,
+    "default_turn_sequence": [1, 4, 5, 2, 3, 6],
+    "require_enforce_turn_sequence" : True,
+    "min_allowed_players": 2,
+    "max_allowed_players": 6,
 }
 
 def __board_to_text(board):
