@@ -40,7 +40,13 @@ def typecheck_single(example, value, type_path = ""):
         return ("At path " + type_path + ": " + s if len(type_path) else s, x, y)
 
     if isinstance(example, str):
-        return True if isinstance(value, str) else err_msg("Not a string")
+        if not isinstance(value, str):
+            return err_msg("Not a string")
+        str_enum = example.split("|")
+        if len(str_enum) > 1:
+            if not value in str_enum:
+                return err_msg("String \"" + value + "\" did not match enumeration \"" + example + "\"")
+        return True 
     if isinstance(example, int):
         return True if isinstance(value, int) else err_msg("Not an int")
     if isinstance(example, float):

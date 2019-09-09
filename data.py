@@ -15,6 +15,7 @@ SeatIndex = 0
 NumericScore = 0
 SeatRank = 0 # a seat rank value of zero means no rank.
 UserToken = "example_token" # for now this is just the cookie
+GameID = "example_game_id"
 PlayerGames = {"" : set([""])} # for now this is just a string -> [string] dictionary.
 
 GameScore = { "$seat_scores": [NumericScore],
@@ -31,15 +32,17 @@ GameStatus = { "is_started": False,
 GameParadigmInfo = {
     "paradigm": "",
     "$version": "",
-    "min_players": 0,
-    "max_players": 0,
+    "$min_allowed_players": 0,
+    "$max_allowed_players": 0,
     "$default_turn_sequence": [0],
-    "$require_enforce_turn_sequence": True, # if there is a turn sequence, this is ignored and assumed to be true.  Also defaults to true if left blank.
+    "$require_enforce_turn_sequence": True, # if there is a default turn sequence, this is ignored and assumed to be true.  Also defaults to true if left blank.
     "$allow_live_seating": False,
-    "$allow_choose_seats": False, }
+    "$allow_choose_seats": True, }
 
 GameInfo = {
    **GameParadigmInfo,
+    "min_players": 0,
+    "max_players": 0,
    # turn timing
    "$initial_time": 0, # total starting time
    "$turn_time": 0, # fixed amount of time per turn
@@ -56,7 +59,8 @@ GameInfo = {
 
 GameListInfo = {
   **GameInfo,
-  play_state: "Open|Active|Finished|Aborted", } # todo value types should handle this enumerated string value literal.
+  "id" : GameID,
+  "play_state": "Open|Active|Finished|Aborted", } # todo value types should handle this enumerated string value literal.
 
 TextHandler = {
     "parseMove" : None, # currently valuetypes does not handle functions
