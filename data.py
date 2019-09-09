@@ -16,6 +16,7 @@ NumericScore = 0
 SeatRank = 0 # a seat rank value of zero means no rank.
 UserToken = "example_token" # for now this is just the cookie
 PlayerGames = {"" : set([""])} # for now this is just a string -> [string] dictionary.
+
 GameScore = { "$seat_scores": [NumericScore],
               "$seat_ranks": [SeatRank],
               "$winners": [SeatIndex],
@@ -27,20 +28,36 @@ GameStatus = { "is_started": False,
                "turn_count": 0,
                "$score": GameScore}
 
+GameParadigmInfo = {
+    "paradigm": "",
+    "$version": "",
+    "min_players": 0,
+    "max_players": 0,
+    "$default_turn_sequence": [0],
+    "$require_enforce_turn_sequence": True, # if there is a turn sequence, this is ignored and assumed to be true.  Also defaults to true if left blank.
+    "$allow_live_seating": False,
+    "$allow_choose_seats": False, }
+
 GameInfo = {
-             "paradigm": "",
-             "$version": "",
-             # configuration and turn stuff
-             "$enforce_turn_sequence": True, # if there is a turn sequence, this is ignored and assumed to be true.  Also defaults to true if left blank.
-             "$turn_sequence": [0],
-             "$initial_time": 0, # total starting time
-             "$turn_time": 0, # fixed amount of time per turn
-             "$turn_time_increment": 0, # time added to total time each turn.
-             #player stuff
-             "min_players": 0,
-             "max_players": 0,
-             "$live_seating": False,
-             "$choose_seats": False, }
+   **GameParadigmInfo,
+   # turn timing
+   "$initial_time": 0, # total starting time
+   "$turn_time": 0, # fixed amount of time per turn
+   "$turn_time_increment": 0, # time added to total time each turn.
+   # player stuff
+   # An instantiated game may overwrite the following properties from its paradigm:
+   # min_players, max_players
+   # Values for the following properties are restricted based on the paradigms value
+   "$live_seating" : False, # may only be true if "allow_live_seating" is True.
+   "$choose_seats" : False, # may only be true if "allow_choose_seats" is True.
+   "$enforce_turn_sequence" : True, # must be true if "require_enforce_turn_sequence" is True.
+   "$turn_sequence" : [0], # TODO copied from "default_turn_sequence", unless the initialized state has a key called "turn_sequenc"
+}
+
+GameListInfo = {
+  **GameInfo,
+  play_state: "Open|Active|Finished|Aborted", } # todo value types should handle this enumerated string value literal.
+
 TextHandler = {
     "parseMove" : None, # currently valuetypes does not handle functions
     "view" : None,
