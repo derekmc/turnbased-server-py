@@ -1,4 +1,8 @@
-bottle
+# requirements-basic.txt   list dependencies, without necessarily specifying versions
+# or including transitive dependencies.
+bottle==0.12.17
+
 # the server bottle should use.  This one seems to work well with minimal requirements
 # see bottle.server_names variable for list of available servers.
 waitress
+# waitress==1.3.1
