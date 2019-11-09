@@ -5,15 +5,24 @@ import sys, os
 if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
+import os
+
 import json, string, copy
 import settings, util
 import data
 from value_types import typecheck as T
 
+import bottle
 from bottle import Bottle, request, response, template, abort, \
                    static_file, BaseTemplate, redirect
 
 from games import games
+
+abs_app_dir_path = os.path.dirname(os.path.realpath(__file__))
+abs_views_path = os.path.join(abs_app_dir_path, 'views')
+bottle.TEMPLATE_PATH.insert(0, abs_views_path )
+print("Template Path", bottle.TEMPLATE_PATH)
+
 game_paradigms = {}
 paradigm_info = {}
 for game in games:
@@ -74,7 +83,7 @@ def open_games():
     get_session()
     game_info_list = list_game_info_helper(data.games,
         lambda game: game['play_state'] == "Open")
-    return template('templates/list_games', game_list=game_info_list, list_title="Open")
+    return template('list_games', game_list=game_info_list, list_title="Open")
 
 
 
@@ -83,7 +92,7 @@ def active_games():
     get_session()
     game_info_list = list_game_info_helper(data.games,
         lambda game: game['play_state'] == "Active")
-    return template('templates/list_games', game_list=game_info_list, list_title="Active")
+    return template('list_games', game_list=game_info_list, list_title="Active")
 
 
 
@@ -97,7 +106,7 @@ def my_games():
 
     game_info_list = list_game_info_helper(player_game_dict,
         lambda game: True)
-    return template('templates/list_games', game_list=game_info_list, list_title="My")
+    return template('list_games', game_list=game_info_list, list_title="My")
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/new', method='GET')
@@ -106,7 +115,7 @@ def games_new_page():
     _data = {
         "paradigms" : paradigm_info
     }
-    return template('templates/new_game', data=_data)
+    return template('new_game', data=_data)
 
 
 # TODO json api vs page navigation.
@@ -189,7 +198,7 @@ def game_lobby(id):
         error_data['destination'] = '/'
         # the id should be clean because it matches the id regex which only allows letters.
         error_data['error_message'] = "Unknown game: '" + id + '" '
-        return template('templates/error', **error_data)
+        return template('error', **error_data)
 
 
     if not id in data.games:
@@ -233,7 +242,7 @@ def game_lobby(id):
         "error_message" : error_message,
     }
 
-    return template('templates/lobby', **template_data)
+    return template('lobby', **template_data)
 
 # seat_index of -1 is used to stand.
 @app.route('/game/<id:re:[a-zA-Z]*>/sit', method="POST")
@@ -254,7 +263,7 @@ def game_sit(id):
         error_data['destination'] = '/'
         # the id should be clean because it matches the id regex which only allows letters.
         error_data['error_message'] = "Unknown game: '" + id + '" '
-        return template('templates/error', **error_data)
+        return template('error', **error_data)
 
     print('game sit form', request.forms)
     info = game['info']
@@ -264,14 +273,14 @@ def game_sit(id):
     sit_index = int(request.forms.get("seat_index"))
     if not allow_seating:
         error_data['error_message'] = "Game started. Sitting or standing not allowed."
-        return template('templates/error', **error_data)
+        return template('error', **error_data)
     else:
         if sit_index != None:
             print("sitting:", sit_index)
             if sit_index < 0:
                 if not cookie in seats:
                     error_data['error_message'] = "Could not stand. Perhaps you are not seated?"
-                    return template('templates/error', **error_data)
+                    return template('error', **error_data)
                 else:
                     seats[seats.index(cookie)] = ""
                     player_games_set.remove(id)
@@ -282,7 +291,7 @@ def game_sit(id):
                         sit_index += 1
                 if sit_index > info['max_players']:
                     error_data['error_message'] = "Could not sit. Only " + str(info['max_players']) + " allowed."
-                    return template('templates/error', **error_data)
+                    return template('error', **error_data)
                 if len(seats) < sit_index:
                     # fill in rest of blank seats
                     seats = seats + [""] * (sit_index - len(seats))
@@ -292,7 +301,7 @@ def game_sit(id):
                     player_games_set.add(id)
                 else:
                     error_data['error_message'] = "Could not sit. Seat " + str(sit_index) + " taken."
-                    return template('templates/error', **error_data)
+                    return template('error', **error_data)
 
     return redirect('/game/' + id + '/lobby')
 
@@ -311,7 +320,7 @@ def game_play_text(id):
         error_data['destination'] = '/'
         # the id should be clean because it matches the id regex which only allows letters.
         error_data['error_message'] = "Unknown game: '" + id + '" '
-        return template('templates/error', **error_data)
+        return template('error', **error_data)
     paradigm = game_paradigms[game['info']['paradigm']]
     info = game['info']
     status = game['status']
@@ -343,7 +352,7 @@ def game_play_text(id):
                 if turn_index > len(seats):
                     error_data['error_message'] = "Server error processing current turn."
                     error_data['destination'] = "/game/" + id + "/lobby"
-                    return template('templates/error', **error_data)
+                    return template('error', **error_data)
                 if len(seats[turn_index - 1]) > 0:
                     turn_remainder -= 1
             if turn_sequence is not None:
@@ -374,7 +383,7 @@ def game_play_text(id):
         if player_count < info['min_players']:
             error_data['error_message'] = "Not enough players to start."
             error_data['destination'] = "/game/" + id + "/lobby"
-            return template('templates/error', **error_data)
+            return template('error', **error_data)
 
         # remove empty seats
         game['seats'] = [seat for seat in seats if len(seat)]
@@ -394,7 +403,7 @@ def game_play_text(id):
     if not hasattr(paradigm, 'text_handler'):
         error_data['error_message'] = "Game has no text handler, cannot play in text mode."
         error_data['destination'] = "/game/" + id + "/lobby"
-        return template('templates/error', **error_data)
+        return template('error', **error_data)
 
     text_handler = T(data.TextHandler, paradigm.text_handler)
 
@@ -403,7 +412,7 @@ def game_play_text(id):
         if not my_turn:
             error_data['error_message'] = "" + game['info']['paradigm'] + ": Not your turn."
             error_data['destination'] = "/game/" + id + "/textplay"
-            return template('templates/error', **error_data)
+            return template('error', **error_data)
 
         parseMove = text_handler['parseMove']
         print(request.forms)
@@ -414,17 +423,17 @@ def game_play_text(id):
             print("error while parsing text move: " + str(e))
             error_data['error_message'] = "" + game['info']['paradigm'] + ": Could not parse text move '" + move_text + "'"
             error_data['destination'] = "/game/" + id + "/textplay"
-            return template('templates/error', **error_data)
+            return template('error', **error_data)
 
         try:
             if not paradigm.verify(game_state, move, my_seat):
                 error_data['error_message'] = "" + game['info']['paradigm'] + ": \"" + move_text + "\" is not a legal move. "
                 error_data['destination'] = "/game/" + id + "/textplay"
-                return template('templates/error', **error_data)
+                return template('error', **error_data)
         except AssertionError as e:
             error_data['error_message'] = "" + game['info']['paradigm'] + ": \"" + move_text + "\" is not a legal move. " + str(e)
             error_data['destination'] = "/game/" + id + "/textplay"
-            return template('templates/error', **error_data)
+            return template('error', **error_data)
 
         updated_game_state = paradigm.update(game_state, move, my_seat)
         game['state'] = updated_game_state
@@ -457,7 +466,7 @@ def game_play_text(id):
         "turn_count" : turn_count,
     }
 
-    return template('templates/text_game', **template_data)
+    return template('text_game', **template_data)
 
 
 

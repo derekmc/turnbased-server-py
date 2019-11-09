@@ -7,4 +7,4 @@ GAME_ID_LEN = 4
 ALLOW_NAMES = True
 ALLOW_CHAT = True # chat includes a maximum number of lines and characters.
 MAX_CHAT_LEN = 10000
-NAV_FILE = "templates/nav.html.tpl"
+NAV_FILE = "views/nav.html.tpl"
