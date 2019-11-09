@@ -55,9 +55,8 @@ body.blurred .overlay {
   padding-top: 25vh;
   color: white;
   text-align: center;
-  display: table-cell;
-  vertical-align: middle;
-  position: absolute;
+  /* vertical-align: middle; */
+  position: fixed;
   z-index: 150;
   display: block;
   top: 0; bottom: 0; left: 0; right: 0;
