@@ -27,7 +27,7 @@ GameScore = { "$seat_scores": [NumericScore],
 GameStatus = { "is_started": False,
                "is_finished": False,
                "turn_count": 0,
-               "$score": GameScore}
+               "$score": GameScore }
 
 GameParadigmInfo = {
     "paradigm": "",
