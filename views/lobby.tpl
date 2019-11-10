@@ -2,19 +2,13 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta http-equiv="refresh" content="20; url=/game/{{game_id}}/lobby" /> -->
     <link rel="stylesheet" type="text/css" href="/static/basic.css">
+    <!-- <meta http-equiv="refresh" content="20; url=/game/{{game_id}}/lobby" /> -->
+    <script src="/static/auto_refresh.js"></script>
     <script>
-      var EXPIRE_TIME = 15*1000;
       var game_id = "{{ game_id }}"
       var my_seat = "{{ my_seat }}"
-      function blurPage(){
-        document.body.classList.add("blurred");
-      }
-      function init(){
-        setTimeout(blurPage, EXPIRE_TIME);
-      }
-      window.addEventListener("load", init);
+
       /*
       function sit(seat){
         var sit_index_input = document.getElementById('sit_index');
@@ -25,13 +19,12 @@
         sit_index_input.value = -1;
       }
       */
-
     </script>
   </head>
   <body class="hide">
     {{! nav_header }}
-    <div class="overlay" onclick="location = location;">
-      <h2> Page Expired </h2>
+    <div class="overlay" onclick="window.location = window.location.pathname;">
+      <h2> Page Idle </h2>
       <h3> Click to Refresh </h3>
     </div>
     <div class="main">
@@ -119,6 +112,7 @@
         <tr><td> 4 </td> <td><button> Stand </button></td></tr>
         <tr><td colspan=2><button> Take Next Seat </button> <button> Enter Game</button></td></tr-->
       </table>
+      <a href="./lobby">Refresh</a>
     </div>
   </body>
 </html>

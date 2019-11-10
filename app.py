@@ -37,11 +37,13 @@ def get_session():
     cookie = request.get_cookie(settings.COOKIE_NAME)
     # check if cookie is exists
     if cookie and cookie in data.cookies:
+        data.save_if_time()
         return cookie
     cookie = util.gen_token(settings.COOKIE_LEN, tries=settings.GEN_ID_TRIES,
                             taken=data.cookies, chars=string.ascii_letters.upper())
     response.set_cookie(settings.COOKIE_NAME, cookie)
     data.cookies.add(cookie)
+    data.save_if_time()
     return cookie
 
 
@@ -87,6 +89,7 @@ def open_games():
     get_session()
     game_info_list = list_game_info_helper(data.games,
         lambda game: game['play_state'] == "Open")
+    data.save_if_time()
     return template('list_games', game_list=game_info_list, list_title="Open")
 
 
@@ -96,6 +99,7 @@ def active_games():
     get_session()
     game_info_list = list_game_info_helper(data.games,
         lambda game: game['play_state'] == "Active")
+    data.save_if_time()
     return template('list_games', game_list=game_info_list, list_title="Active")
 
 
@@ -110,6 +114,7 @@ def my_games():
 
     game_info_list = list_game_info_helper(player_game_dict,
         lambda game: True)
+    data.save_if_time()
     return template('list_games', game_list=game_info_list, list_title="My")
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
@@ -119,6 +124,7 @@ def games_new_page():
     _data = {
         "paradigms" : paradigm_info
     }
+    data.save_if_time()
     return template('new_game', data=_data)
 
 
@@ -169,7 +175,7 @@ def games_new_page():
     # if hasattr(game_paradigm_handler, "init"):
     #    init_state = game_paradigm_handler.init(game_args)
 
-    print('game_args', game_args)
+    #print('game_args', game_args)
 
     game_id = util.gen_token(settings.GAME_ID_LEN)
 
@@ -185,10 +191,11 @@ def games_new_page():
     })
     data.games[game_id] = game
 
+    data.save_if_time()
     return redirect('/game/' + game_id + '/lobby')
 
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="GET")
-@app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="POST")
+#@app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="POST")
 def game_lobby(id):
     cookie = get_session()
     user_token = cookie
@@ -230,10 +237,10 @@ def game_lobby(id):
             my_seat = i + 1
     can_start = my_seat > 0 and (not status['is_started']) and seat_count >= info.get('min_players', 0)
     filtered_seats = ["x" if len(seat) else "" for seat in seats]
-    print("seat count, min_seats, can_start", seat_count, info.get('min_players', 0), can_start)
+    #print("seat count, min_seats, can_start", seat_count, info.get('min_players', 0), can_start)
 
-    print("user 'my_seat'", my_seat)
-    print("seats", seats)
+    #print("user 'my_seat'", my_seat)
+    #print("seats", seats)
 
     template_data = {
         "game_id" : id,
@@ -251,7 +258,7 @@ def game_lobby(id):
 # seat_index of -1 is used to stand.
 @app.route('/game/<id:re:[a-zA-Z]*>/sit', method="POST")
 def game_sit(id):
-    print("Game Sit called.")
+    #print("Game Sit called.")
     cookie = get_session()
     error_data = {
       "error_message": "An error ocurred.",
@@ -269,7 +276,7 @@ def game_sit(id):
         error_data['error_message'] = "Unknown game: '" + id + '" '
         return template('error', **error_data)
 
-    print('game sit form', request.forms)
+    #print('game sit form', request.forms)
     info = game['info']
     seats = game['seats']
     status = game['status']
@@ -280,7 +287,7 @@ def game_sit(id):
         return template('error', **error_data)
     else:
         if sit_index != None:
-            print("sitting:", sit_index)
+            #print("sitting:", sit_index)
             if sit_index < 0:
                 if not cookie in seats:
                     error_data['error_message'] = "Could not stand. Perhaps you are not seated?"
@@ -307,12 +314,13 @@ def game_sit(id):
                     error_data['error_message'] = "Could not sit. Seat " + str(sit_index) + " taken."
                     return template('error', **error_data)
 
+    data.save_if_time()
     return redirect('/game/' + id + '/lobby')
 
 @app.route('/game/<id:re:[a-zA-Z]*>/textplay', method="POST")
 @app.route('/game/<id:re:[a-zA-Z]*>/textplay', method="GET")
 def game_play_text(id):
-    print("'Game Play Text' called.")
+    #print("'Game Play Text' called.")
     cookie = get_session()
     error_data = {
       "error_message": "An error ocurred.",
@@ -447,6 +455,7 @@ def game_play_text(id):
         if score_result.get("game_over", False):
             game['status']['is_finished'] = True
         process_turn_info()
+        # save data
 
     view = text_handler['view']
     game_text = view(game['state'])
@@ -455,7 +464,7 @@ def game_play_text(id):
     if "moves" in text_handler:
         move_list = text_handler['moves'](game['state'])
 
-    print("move_list", move_list)
+    #print("move_list", move_list)
 
     template_data = {
         "game_id" : id,
@@ -470,6 +479,7 @@ def game_play_text(id):
         "turn_count" : turn_count,
     }
 
+    data.save_if_time()
     return template('text_game', **template_data)
 
 

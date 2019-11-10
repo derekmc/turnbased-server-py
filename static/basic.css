@@ -38,20 +38,20 @@ a:visited{ color: blue; }
     border-radius: 0.45em;
 }
 
-body.blurred{
+body.idle{
   display: table;
   overflow: hidden;
 }
-body.blurred .nav{
+body.idle .nav{
   filter: blur(3px);
 }
-body.blurred .main{
+body.idle .main{
   filter: blur(3px);
 }
 body .overlay {
    display: none;
 }
-body.blurred .overlay {
+body.idle .overlay {
   padding-top: 25vh;
   color: white;
   text-align: center;

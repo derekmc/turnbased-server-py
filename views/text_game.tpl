@@ -12,25 +12,18 @@
 
      * { }
     </style>
-    <script>
-      var EXPIRE_TIME = 15*1000;
-      function blurPage(){
-        document.body.classList.add("blurred");
-      }
-      function init(){
-        %if not my_turn:
-          setTimeout(blurPage, EXPIRE_TIME);
-        %end
-      }
-      window.addEventListener("load", init);
-    </script>
+    %if not my_turn:
+      <script src="/static/auto_refresh.js"></script>
+      <script>
+        REFRESH_TIME = 7.5*1000;
+      </script>
+    %end
   </head>
 
   <body>
     {{! nav_header }}
-
-    <div class="overlay" onclick='location = location');">
-      <h2> Page Expired </h2>
+    <div class="overlay" onclick="window.location = window.location.pathname;">
+      <h2> Page Idle </h2>
       <h3> Click to Refresh </h3>
     </div>
     <div class="main">

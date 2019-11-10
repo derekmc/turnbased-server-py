@@ -1,9 +1,19 @@
 
 
+import settings, sched, time, pickle, datetime
+
+from value_types import typecheck as T
+
+# seconds to wait between saving
+# set to 0 to save after every operation.
+SAVE_TIME = 30 
+last_save = datetime.datetime.now()
+
 # for now, the user_token is just their cookie
 games = {} # {"id": {state, info, status, chat, "seats": [user_token]}
 player_games = {} # {"user_token": [game_id]}
 cookies = set()  # { "woiSSeDJ" }
+       
 
 #"status": {seat_scores, seat_ranks, seat_winners, seat_losers, is_started, is_finished}
 STATUS_STARTED = "STARTED"
@@ -73,3 +83,43 @@ Game = { "state": None,
          "status": GameStatus,
          "$chat": "",
          "seats": [UserToken]}
+
+def dump():
+    state = {"games": games, "player_games": player_games, "cookies": cookies}
+    try:
+        with open(settings.DATA_FILE) as f:
+            pickle.dump(state, f)
+    except IOError:
+        print("\"%s\" could not save data file." % (settings.DATA_FILE,))
+    except pickle.PicklingError:
+        print("\"%s\" data file could not be pickled." % (settings.DATA_FILE,))
+
+def load():
+    global games, player_games, cookies
+    try:
+        with open(settings.DATA_FILE) as f:
+            state = pickle.load(f)
+        games = T({"": Game}, state.games)
+        player_games = T(PlayerGames, state.player_games)
+        cookies = T({UserToken}, state.cookies)
+    except FileNotFoundError as e:
+        print("\"%s\" data file not found." % (settings.DATA_FILE,))
+        print(e)
+    except pickle.UnpicklingError as e:
+        print("\"%s\" data file could not be unpickled." % (settings.DATA_FILE,))
+        print(e)
+    except TypeError as e:
+        print("\"%s\" data was invalid type." % (settings.DATA_FILE,))
+        print(e)
+
+# dumps the data if a sufficient delay has passed since last save
+def save_if_time():
+    now = datetime.datetime.now()
+    global last_save
+    delay = now - last_save
+    if delay.days > 0 or delay.seconds > SAVE_TIME:
+        print("Saving data...")
+        dump()
+
+    last_save = now
+        
