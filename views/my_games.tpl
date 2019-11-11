@@ -39,7 +39,8 @@
           var max_players = game.max_players;
          
           var tr = elem(table, 'tr');
-          elem(elem(tr, 'td'), 'a', {href: '/game/' + game.id + '/lobby', text: game.id});
+          var link_href = '/game/' + game.id + (game.status.is_started? '/textplay' : '/lobby');
+          elem(elem(tr, 'td'), 'a', {href: link_href, text: game.id});
           elem(tr, 'td', {text: game.paradigm});
           elem(tr, 'td', {text: min_players == max_players? min_players : min_players + " - " + max_players});
         }

@@ -10,10 +10,16 @@
     <div id="main">
 
      <table class="listtable">
-      %for game in game_list:
-       <tr><td><a href='/game/{{game['id']}}/lobby'>{{game['id']}}</a></td>
-           <td>{{game['paradigm']}}</td>
-           <td>{{game['play_state']}}</td>
+      %for game_info in game_list:
+        <tr>
+          %play_state = game_info['play_state']
+          %if play_state == "Active" or play_state == "Finished":
+            <td><a href='/game/{{game_info['id']}}/textplay'>{{game_info['id']}}</a></td>
+          %else:
+            <td><a href='/game/{{game_info['id']}}/lobby'>{{game_info['id']}}</a></td>
+          %end
+          <td>{{game_info['paradigm']}}</td>
+          <td>{{game_info['play_state']}}</td>
        </tr>
       %end
       %if len(game_list) == 0:
