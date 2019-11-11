@@ -38,9 +38,6 @@
       %elif not status["is_finished"]:
         <!-- TODO handle seat scores and seat ranks -->
         <b>{{!"Your Move" if my_turn else "Player " + str(turn_index) + "'s Turn."}}</b>
-        %if not my_turn:
-          &nbsp; <a href="./textplay">Refresh</a>
-        %end
         <br><br>
         %if my_turn:
           %if move_list:
@@ -84,6 +81,9 @@
       <span style="font-size: 160%; font-family: monospace;">
         <pre>{{ game_text }}</pre>
       </span>
+      %if status['is_started'] and not status['is_finished'] and not my_turn:
+        <a href="./textplay">Refresh</a>
+      %end
       <hr>
       <span style="font-size: 10pt;">
         <p>This is a text-based interface for turnbased games.
