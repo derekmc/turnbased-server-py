@@ -75,6 +75,8 @@ GameListInfo = {
 TextHandler = {
     "parseMove" : None, # currently valuetypes does not handle functions
     "view" : None,
+    "$csvView" : None, # comma separated table. TODO Leading and trailing subscripts and superscripts.
+    "$csvNames" : None, # map table positions to square names
     "$moves" : None, # optional function computing legal moves
 }
 
