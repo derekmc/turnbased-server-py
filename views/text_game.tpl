@@ -12,7 +12,7 @@
 
      * { }
     </style>
-    %if not my_turn:
+    %if status["is_started"] and not my_turn and not status["is_finished"]:
       <script src="/static/auto_refresh.js"></script>
       <script>
         REFRESH_TIME = 7.5*1000;
@@ -33,31 +33,56 @@
         <h3> Version {{info['version']}}</h3>
       %end
 
-      <b>{{!"Your Move" if my_turn else "Player " + str(turn_index) + "'s Turn."}}</b>
-      <br><br>
-
-      %if not my_turn:
-        <a href="./textplay">Refresh</a>
-      %end
-
-      %if my_turn:
-        %if move_list:
-          %for move in move_list:
+      %if not status["is_started"]: # required attribute should be present.
+        Game has not started (how are you even here?)
+      %elif status["is_finished"]:
+        Game finished.
+        %if score:
+          %if "winners" in score:
+            %for winner in score["winners"]:
+              %if winner == my_seat:
+                You won!
+              %else:
+                Player {{winner}} won.
+              %end
+            %end
+          %end
+          %if "losers" in score:
+            %for loser in score["losers"]:
+              %if loser == my_seat:
+                You lost.
+              %else:
+                Player {{loser}} lost.
+              %end
+            %end
+          %end
+        %end
+      %else:
+        <!-- TODO handle seat scores and seat ranks -->
+        <b>{{!"Your Move" if my_turn else "Player " + str(turn_index) + "'s Turn."}}</b>
+        <br><br>
+        %if my_turn:
+          %if move_list:
+            %for move in move_list:
+              <form method="POST">
+                <input type="hidden" name="move_text" value="{{move}}">
+                <input type="submit" value="{{move}}"/>
+              </form>
+            %end
+          %else:
             <form method="POST">
-              <input type="hidden" name="move_text" value="{{move}}">
-              <input type="submit" value="{{move}}"/>
+              <input name="move_text" type="text" title="(example: (example_move goes here))">
+              <input type="submit" value="Submit"/>
             </form>
           %end
-        %else:
-          <form method="POST">
-            <input name="move_text" type="text" title="(example: (example_move goes here))">
-            <input type="submit" value="Submit"/>
-          </form>
+        %end
+        <span style="font-size: 160%; font-family: monospace;">
+          <pre>{{ game_text }}</pre>
+        </span>
+        %if not my_turn:
+          <a href="./textplay">Refresh</a>
         %end
       %end
-      <span style="font-size: 160%; font-family: monospace;">
-        <pre>{{ game_text }}</pre>
-      </span>
 
       <hr>
       <span style="font-size: 10pt;">

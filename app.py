@@ -455,7 +455,6 @@ def game_play_text(id):
         if score_result.get("game_over", False):
             game['status']['is_finished'] = True
         process_turn_info()
-        # save data
 
     view = text_handler['view']
     game_text = view(game['state'])
@@ -477,8 +476,11 @@ def game_play_text(id):
         "my_turn" : my_turn,
         "turn_index" : turn_index,
         "turn_count" : turn_count,
+        "status" : game['status'],
+        "score" : game['status'].get('score', None),
     }
 
+    # save data
     data.save_if_time()
     return template('text_game', **template_data)
 
