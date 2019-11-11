@@ -8,4 +8,5 @@ ALLOW_NAMES = True
 ALLOW_CHAT = True # chat includes a maximum number of lines and characters.
 MAX_CHAT_LEN = 10000
 NAV_FILE = "views/nav.html.tpl"
-DATA_FILE = "game_data.txt"
+DATA_FILE = "game_data.pickle"
+VERBOSE = True

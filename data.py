@@ -87,21 +87,27 @@ Game = { "state": None,
 def dump():
     state = {"games": games, "player_games": player_games, "cookies": cookies}
     try:
-        with open(settings.DATA_FILE) as f:
+        with open(settings.DATA_FILE, 'wb') as f:
             pickle.dump(state, f)
-    except IOError:
+        if settings.VERBOSE:
+            print("Data saved successfully.")
+    except IOError as e:
         print("\"%s\" could not save data file." % (settings.DATA_FILE,))
-    except pickle.PicklingError:
+        print(e)
+    except pickle.PicklingError as e:
         print("\"%s\" data file could not be pickled." % (settings.DATA_FILE,))
+        print(e)
 
 def load():
     global games, player_games, cookies
     try:
-        with open(settings.DATA_FILE) as f:
+        with open(settings.DATA_FILE, 'rb') as f:
             state = pickle.load(f)
-        games = T({"": Game}, state.games)
-        player_games = T(PlayerGames, state.player_games)
-        cookies = T({UserToken}, state.cookies)
+        games = T({"": Game}, state['games'])
+        player_games = T(PlayerGames, state['player_games'])
+        cookies = T({UserToken}, state['cookies'])
+        if settings.VERBOSE:
+            print("Data loaded successfully.")
     except FileNotFoundError as e:
         print("\"%s\" data file not found." % (settings.DATA_FILE,))
         print(e)
@@ -117,9 +123,9 @@ def save_if_time():
     now = datetime.datetime.now()
     global last_save
     delay = now - last_save
+    #print('last save was ' + str(delay.seconds) + ' seconds ago.')
     if delay.days > 0 or delay.seconds > SAVE_TIME:
-        print("Saving data...")
+        if settings.VERBOSE:
+            print("Saving data...", now)
         dump()
-
-    last_save = now
-        
+        last_save = now

@@ -427,7 +427,7 @@ def game_play_text(id):
             return template('error', **error_data)
 
         parseMove = text_handler['parseMove']
-        print(request.forms)
+        # print(request.forms)
         move_text = request.forms.get("move_text")
         try:
             move = parseMove(move_text)
