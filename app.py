@@ -10,6 +10,7 @@ import os
 import json, string, copy
 import settings, util
 import data
+import random
 from value_types import typecheck as T
 
 import bottle
@@ -398,17 +399,27 @@ def game_play_text(id):
             return template('error', **error_data)
 
         # remove empty seats
-        game['seats'] = [seat for seat in seats if len(seat)]
+        # randomize seating if choose_seats is allowed
+        seats = [seat for seat in seats if len(seat)]
+        print('seat order', seats)
+        if not info['choose_seats']:
+            seats_left = seats.copy()
+            seats = []
+            while len(seats_left):
+                seat = random.choice(seats_left)
+                seats.append(seat)
+                seats_left.remove(seat)
+            print('randomized seat order', seats)
+        game['seats'] = seats
         init_args = {
             "player_count" : player_count
         }
         #print(init_args)
 
         game['state'] = paradigm.init(init_args)
+
+
         status['is_started'] = True
-
-
-
 
     process_turn_info()
 
