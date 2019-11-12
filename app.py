@@ -401,7 +401,7 @@ def game_play_text(id):
         # remove empty seats
         # randomize seating if choose_seats is allowed
         seats = [seat for seat in seats if len(seat)]
-        print('seat order', seats)
+        # print('seat order', seats)
         if not info['choose_seats']:
             seats_left = seats.copy()
             seats = []
@@ -409,7 +409,7 @@ def game_play_text(id):
                 seat = random.choice(seats_left)
                 seats.append(seat)
                 seats_left.remove(seat)
-            print('randomized seat order', seats)
+            # print('randomized seat order', seats)
         game['seats'] = seats
         init_args = {
             "player_count" : player_count
