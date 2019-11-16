@@ -1,8 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from sys import argv
+import datetime
 FILENAME = 'todo.txt'
 DEFAULT_LIST = 5
+DATE_PREFIX = " -- "
 
 help_msg = """
 todo (task description)
@@ -31,11 +33,30 @@ __file = open(FILENAME, 'a+')
 #__file.write("")
 #__file.close()
 lines = open(FILENAME, 'r').readlines()
-lines = list(filter(lambda x: len(x.strip())>0, lines))
+# a line starting with a single hash are comments, and are ignored.
+# a line starting with a double hash are finished items.  The script doesn't use them for anything,
+# but they are there for the heck of it.
+
+today = "" + datetime.datetime.now().strftime('%y.%m.%d')
+# write all 'todo' lines first, and then other lines at the end of the file.
+todo_lines = []
+other_lines = []
+for line in lines:
+    if len(line.strip()) and line[0] != "#":
+        todo_lines.append(line)
+    else:
+        other_lines.append(line)
+lines = todo_lines
 
 def dump():
     # __file.write("".join(lines))
-    open(FILENAME, 'w').write("".join(lines))
+    open(FILENAME, 'w').write("".join(lines) + "".join(other_lines))
+
+def format_todo_line(line):
+    cutoff = line.rfind(DATE_PREFIX)
+    if cutoff > 0:
+        line = line[:cutoff]
+    return line.rstrip()
 
 def listitems(index, na):
     if index <= 1:
@@ -44,13 +65,13 @@ def listitems(index, na):
     i = 1
     print("==== TODO LIST (%d/%d) ====" % (to_list, len(lines)))
     for line in lines:
-        print(" %d - %s" % ( i, line.rstrip() ))
+        print("%d - %s" % ( i, format_todo_line(line)))
         i += 1
         if i > index:
             break
 
 def add(index, item):
-    lines.insert(index-1, item)
+    lines.insert(index-1, item[:-1] + DATE_PREFIX + today + "\n")
     dump()
     to_list = max(index, DEFAULT_LIST)
     listitems(to_list, item)
@@ -95,10 +116,12 @@ def done(index, na):
     except:
         print("-- todo: no item #%d --" % (index + 1))
         return
-    confirm = input("Remove item \"" + item.strip() + "\" (Y/n): ")
+    confirm = input("Remove item \"" + format_todo_line(item) + "\" (Y/n): ")
     confirm = confirm.strip().lower()
     if confirm == "" or confirm == "y" or confirm == "yes":
+        line = lines[index]
         del lines[index]
+        other_lines.append("## " + line[:-1] + " - " + today + "\n")
         dump()
         listitems(DEFAULT_LIST, na)
         print("-- item #" + str(index + 1) + " removed -- ")
