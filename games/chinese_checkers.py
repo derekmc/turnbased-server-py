@@ -14,9 +14,13 @@ def __board_to_text(board):
     lines = board.replace('-', '').replace(' ', '.').split("\n")
     return "\n".join([" ".join(list(line)) for line in lines])
 
+def __raw_board_str(board):
+    return "\n".join(["".join(row) for row in board])
+
+
 def __parse_move(move):
-    array = move.split(',')
-    return zip(array[0::2], array[1::2])
+    squares = move.split('-')
+    return [(ord(square[0]) - ord('a') + 1, int(square[1:]) - 1) for square in squares]
 
 text_handler = {
    "view" : lambda data: __board_to_text(data['board']),
@@ -58,8 +62,8 @@ text_handler = {
 
 
 # dashes represent squares that can't be filled.
+#ABCDEFGHIJKLMNOPQ#
 start_board_str = """
- ABCDEFGHIJKLMNOPQ
 -----1-------------
 -----11------------
 -----111-----------
@@ -90,10 +94,11 @@ for i in range(len(pieces_str)):
 
 
 def parse_board(s):
-    return [row.split("") for row in s.split("\n")]
+    return [list(row) for row in s.strip().split("\n")]
 
 
 def __get_board(board, pos):
+    # print('board', board)
     x = pos[0]
     y = pos[1]
 
@@ -101,6 +106,7 @@ def __get_board(board, pos):
         return -1
 
     row = board[y]
+    # print('row', row)
 
     if x < 0 or x >= len(row):
         return -1
@@ -112,6 +118,7 @@ def __get_board(board, pos):
 
 
 def __set_board(board, pos, piece):
+    print('setting', pos, piece)
     x = pos[0]
     y = pos[1]
 
@@ -126,7 +133,8 @@ def __set_board(board, pos, piece):
     if piece < -1 or piece > 6:
         piece = -1
 
-    piece_character = pieces_str[piece - 1]
+    #row[x] = piece
+    piece_character = pieces_str[piece + 1]
     row[x] = piece_character
 
     return True
@@ -134,6 +142,8 @@ def __set_board(board, pos, piece):
 
 
 def __is_valid_move(board, pos_list):
+    #print('move pos list', pos_list)
+    #print('board', "\n".join(["".join(row) for row in board]))
 
     single_step = (len(pos_list) == 2)
 
@@ -145,9 +155,10 @@ def __is_valid_move(board, pos_list):
         dy = b[1] - a[1]
         adx = abs(dx)
         ady = abs(dy)
+        # print('dx, dy, adx, ady', dx, dy, adx, ady)
 
         # midpoint of a, b
-        c = (a[0] + dx/2, a[1] + dy/2)
+        c = (a[0] + int(dx/2), a[1] + int(dy/2))
 
         # source piece
         p = __get_board(board, a)
@@ -157,6 +168,7 @@ def __is_valid_move(board, pos_list):
 
         # middle piece
         r = __get_board(board, c)
+        #print('source, destination, middle', p,q,r)
 
         # cannot go off board
         if q == -1:
@@ -180,19 +192,25 @@ def __is_valid_move(board, pos_list):
 
         # move or jump along y=x diagonal
         valid_step = (valid_step or
-            abx == 1 and aby == 1 and dx == dy and single_step or
-            abx == 2 and aby == 2 and dx == dy and r > 0)
+            adx == 1 and ady == 1 and dx == dy and single_step or
+            adx == 2 and ady == 2 and dx == dy and r > 0)
 
         if not valid_step:
             return False
+    return True
 
 
 
 def __make_move(board, pos_list):
     a = pos_list[0]
-    b = pos_list[len(pos_list) - 1]
+    b = pos_list[-1]
     piece = __get_board(board, a)
+    print('piece', piece)
+    print('a', a)
+    print('b', b)
+    #print('update, piece, dest', board, a, b, piece, __get_board(board, b))
     __set_board(board, b, piece)
+    __set_board(board, a, 0)
 
 
 
@@ -208,15 +226,24 @@ def init(init_args):
         board_str = board_str.replace(str(i), " ")
     data = {
         'player_count' : player_count,
-        'board' : board_str,
+        'board' : board_str
     }
     return data
 
 # move is a list of position tuples, but fixed length arrays should also work.
 def verify(data, move, seat):
-    board = parse_board(data.board)
+    board = parse_board(data['board'])
+    #print('data, move, seat', data, move, seat)
     piece = __get_board(board, move[0])
 
     # TODO validation of datstructures.
     return __is_valid_move(board, move)
+
+def update(data, move, seat):
+    board = parse_board(data['board'])
+    #print('move', move)
+    __make_move(board, move)
+    data['board'] = __raw_board_str(board)
+    #print('board', data['board'])
+    return data
 

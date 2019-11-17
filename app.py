@@ -388,7 +388,7 @@ def game_play_text(id):
         if my_seat == 0:
             error_data['error_message'] = "Game hasn't started."
             error_data['destination'] = "/game/" + id + "/lobby"
-            return template('templates/error', **error_data)
+            return template('error', **error_data)
 
         # check minimum player count
         if player_count < info['min_players']:
@@ -440,6 +440,7 @@ def game_play_text(id):
         move_text = request.forms.get("move_text")
         try:
             move = parseMove(move_text)
+            print('move', move)
         except Exception as e:
             print("error while parsing text move: " + str(e))
             error_data['error_message'] = "" + game['info']['paradigm'] + ": Could not parse text move '" + move_text + "'"
@@ -459,15 +460,27 @@ def game_play_text(id):
         updated_game_state = paradigm.update(game_state, move, my_seat)
         game['state'] = updated_game_state
         game['status']['turn_count'] += 1
-        score_result = paradigm.score(updated_game_state,)
-        game['status']['score'] = score_result
-        if score_result.get("game_over", False):
-            game['status']['is_finished'] = True
+        if hasattr(paradigm, 'score'):
+            score_result = paradigm.score(updated_game_state,)
+            game['status']['score'] = score_result
+            if score_result.get("game_over", False):
+                game['status']['is_finished'] = True
         process_turn_info()
 
     view = text_handler['view']
-    game_text = view(game['state'])
+    try:
+        print('game state', game['state'])
+        game_text = view(game['state'])
+    except Exception as e:
+        error_data['error_message'] = "" + game['info']['paradigm'] + ": error rendering view. " + str(e)
+        error_data['destination'] = "/game/" + id + "/textplay"
+        return template('error', **error_data)
+        
     square_link_template = "<a class='text_square' onclick='squareClick(\"%s\")' id='square_%s'>%s</a>"
+    static_square_template = "<span class='text_square'>%s</span>"
+    render_square = (lambda name, value:
+        (square_link_template % (name, name, value)) if my_turn else (static_square_template % value))
+
     # todo handle csvView
     if 'csvNames' in text_handler:
         names = re.split(',\s+', text_handler['csvNames'])
@@ -480,7 +493,7 @@ def game_play_text(id):
             values.extend(line)
         squares = zip(names, values)
         # print('squares', squares)
-        game_text = "".join([square_link_template % (name, name, value) for (name, value) in squares])
+        game_text = "".join([render_square(name, value) for (name, value) in squares])
         # print('game_text', game_text)
 
     # print(game_text)
