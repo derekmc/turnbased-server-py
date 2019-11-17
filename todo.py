@@ -43,6 +43,8 @@ todo_lines = []
 other_lines = []
 for line in lines:
     if len(line.strip()) and line[0] != "#":
+        if line[-1] != '\n': # make sure end of line is a newline. Needed for last line of file.
+            line += '\n'
         todo_lines.append(line)
     else:
         other_lines.append(line)
