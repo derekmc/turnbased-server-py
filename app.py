@@ -5,12 +5,10 @@ import sys, os
 if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
-import os
 
-import json, string, copy
-import settings, util
-import data
-import random
+import json, string, copy, re, random
+import settings, util, data
+
 from value_types import typecheck as T
 
 import bottle
@@ -469,6 +467,22 @@ def game_play_text(id):
 
     view = text_handler['view']
     game_text = view(game['state'])
+    square_link_template = "<a class='text_square' onclick='squareClick(\"%s\")' id='square_%s'>%s</a>"
+    # todo handle csvView
+    if 'csvNames' in text_handler:
+        names = re.split(',\s+', text_handler['csvNames'])
+        lines = [list(filter((lambda x: x != " "), list(line))) for line in game_text.split("\n")]
+        # print('lines', lines)
+        values = []
+        for line in lines:
+            if len(line) > 0:
+                line[-1] += "\n"
+            values.extend(line)
+        squares = zip(names, values)
+        # print('squares', squares)
+        game_text = "".join([square_link_template % (name, name, value) for (name, value) in squares])
+        # print('game_text', game_text)
+
     # print(game_text)
     move_list = None
     if "moves" in text_handler:

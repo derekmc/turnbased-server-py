@@ -71,4 +71,15 @@ input[type=submit], button{
     font-size:116%; text-transform: uppercase;
     font-family: monospace; font-weight: bold;
 }
+.text_square.clicked{
+  color: white;
+  background: black;
+}
+.text_square{
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 120%;
+  cursor: pointer;
+  padding: 0.15em 0.35em;
+}
 

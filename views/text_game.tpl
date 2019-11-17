@@ -18,9 +18,28 @@
         REFRESH_TIME = 7.5*1000;
       </script>
     %end
+    <script>
+        function squareClick(square_name){
+            var move_text_input = document.getElementById("move_text_input");
+            var square_elem = document.getElementById("square_" + square_name);
+            if(move_text_input.value.length){
+                move_text_input.value += "-"; }
+            move_text_input.value += square_name;
+            square_elem.classList.add('clicked');
+        }
+        function clearMove(){
+            var move_text_input = document.getElementById("move_text_input");
+            move_text_input.value = "";
+            var clicked_squares = document.getElementsByClassName('clicked');
+            // removing the class removes the item from 
+            // the datastructure, so always use index 0
+            while(clicked_squares.length){
+                clicked_squares[0].classList.remove('clicked'); }
+        }
+    </script>
   </head>
 
-  <body style="text-align: center">
+  <body>
     {{! nav_header }}
     <div class="overlay" onclick="window.location = window.location.pathname;">
       <h2> Page Idle </h2>
@@ -49,9 +68,10 @@
             %end
           %else:
             <form method="POST">
-              <input name="move_text" type="text" title="(example: (example_move goes here))">
+              <input id="move_text_input" name="move_text" type="text" title="(example: (example_move goes here))">
               <input type="submit" value="Submit"/>
             </form>
+            <button onclick="clearMove()">Clear</button>
           %end
         %end
       %else:
@@ -78,9 +98,9 @@
         %end
       %end
 
-      <span style="font-size: 160%; font-family: monospace;">
-        <pre>{{ game_text }}</pre>
-      </span>
+      <div style="font-size: 160%; font-family: monospace;">
+        <div style="text-align: center">{{! game_text.replace('\n','<br>') }}</pre>
+      </div>
       %if status['is_started'] and not status['is_finished'] and not my_turn:
         <a href="./textplay">Refresh</a>
       %end
