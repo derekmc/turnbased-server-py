@@ -20,7 +20,7 @@
     %end
   </head>
 
-  <body>
+  <body style="text-align: center">
     {{! nav_header }}
     <div class="overlay" onclick="window.location = window.location.pathname;">
       <h2> Page Idle </h2>

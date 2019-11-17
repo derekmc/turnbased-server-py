@@ -1,2 +1,4 @@
+make chinese checkers textplay clickable csv grid. -- 19.11.16
 ## enforce turn sequence - 19.11.16
 ## refresh button, and gray out "stale" page, except for refresh button, after a timeout, unless it's the current players active move.  (perhaps we auto refresh a few times in active games). - 19.11.16
+## chinese checkers should use centered ascii output -- 19.11.16 - 19.11.16
