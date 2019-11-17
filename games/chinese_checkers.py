@@ -25,7 +25,8 @@ def __parse_move(move):
 text_handler = {
    "view" : lambda data: __board_to_text(data['board']),
    "parseMove" : __parse_move,
-   "csvNames" : "e1, e2, f2, e3, f3, g3, e4, f4, g4, h4, " +
+   "multiMove" : True,
+   "squareNames" : "e1, e2, f2, e3, f3, g3, e4, f4, g4, h4, " +
                 "a5, b5, c5, d5, e5, f5, g5, h5, i5, j5, k5, l5, m5, " +
                 "b6, c6, d6, e6, f6, g6, h6, i6, j6, k6, l6, m6, " +
                 "c7, d7, e7, f7, g7, h7, i7, j7, k7, l7, m7, " +
@@ -35,7 +36,7 @@ text_handler = {
                 "e11, f11, g11, h11, i11, j11, k11, l11, m11, n11, o11, " +
                 "e12, f12, g12, h12, i12, j12, k12, l12, m12, n12, o12, p12, " +
                 "e13, f13, g13, h13, i13, j13, k13, l13, m13, n13, o13, p13, q13, " +
-                "j14, k14, l14, m14, k15, l15, m15, l16, m16, n17",
+                "j14, k14, l14, m14, k15, l15, m15, l16, m16, m17",
 }
 
 # visual board layout
@@ -98,7 +99,6 @@ def parse_board(s):
 
 
 def __get_board(board, pos):
-    # print('board', board)
     x = pos[0]
     y = pos[1]
 
@@ -106,7 +106,6 @@ def __get_board(board, pos):
         return -1
 
     row = board[y]
-    # print('row', row)
 
     if x < 0 or x >= len(row):
         return -1
@@ -118,7 +117,6 @@ def __get_board(board, pos):
 
 
 def __set_board(board, pos, piece):
-    print('setting', pos, piece)
     x = pos[0]
     y = pos[1]
 
@@ -142,8 +140,6 @@ def __set_board(board, pos, piece):
 
 
 def __is_valid_move(board, pos_list):
-    #print('move pos list', pos_list)
-    #print('board', "\n".join(["".join(row) for row in board]))
 
     single_step = (len(pos_list) == 2)
 
@@ -155,7 +151,6 @@ def __is_valid_move(board, pos_list):
         dy = b[1] - a[1]
         adx = abs(dx)
         ady = abs(dy)
-        # print('dx, dy, adx, ady', dx, dy, adx, ady)
 
         # midpoint of a, b
         c = (a[0] + int(dx/2), a[1] + int(dy/2))
@@ -168,7 +163,6 @@ def __is_valid_move(board, pos_list):
 
         # middle piece
         r = __get_board(board, c)
-        #print('source, destination, middle', p,q,r)
 
         # cannot go off board
         if q == -1:
@@ -205,22 +199,17 @@ def __make_move(board, pos_list):
     a = pos_list[0]
     b = pos_list[-1]
     piece = __get_board(board, a)
-    print('piece', piece)
-    print('a', a)
-    print('b', b)
-    #print('update, piece, dest', board, a, b, piece, __get_board(board, b))
     __set_board(board, b, piece)
     __set_board(board, a, 0)
 
 
 
 def init(init_args):
-    print(init_args)
+    print('init chinese checkers', init_args)
     player_count = 2
     if 'player_count' in init_args:
         player_count = init_args['player_count']
     board_str = start_board_str
-    print(player_count)
 
     for i in range(int(player_count) + 1, 7):
         board_str = board_str.replace(str(i), " ")
@@ -233,7 +222,6 @@ def init(init_args):
 # move is a list of position tuples, but fixed length arrays should also work.
 def verify(data, move, seat):
     board = parse_board(data['board'])
-    #print('data, move, seat', data, move, seat)
     piece = __get_board(board, move[0])
 
     # TODO validation of datstructures.
@@ -241,9 +229,7 @@ def verify(data, move, seat):
 
 def update(data, move, seat):
     board = parse_board(data['board'])
-    #print('move', move)
     __make_move(board, move)
     data['board'] = __raw_board_str(board)
-    #print('board', data['board'])
     return data
 

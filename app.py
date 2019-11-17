@@ -428,6 +428,8 @@ def game_play_text(id):
 
     text_handler = T(data.TextHandler, paradigm.text_handler)
 
+    illegal_move = None
+
     # TODO handle post request
     if request.method == "POST":
         if not my_turn:
@@ -440,7 +442,7 @@ def game_play_text(id):
         move_text = request.forms.get("move_text")
         try:
             move = parseMove(move_text)
-            print('move', move)
+            #print('move', move)
         except Exception as e:
             print("error while parsing text move: " + str(e))
             error_data['error_message'] = "" + game['info']['paradigm'] + ": Could not parse text move '" + move_text + "'"
@@ -449,27 +451,27 @@ def game_play_text(id):
 
         try:
             if not paradigm.verify(game_state, move, my_seat):
-                error_data['error_message'] = "" + game['info']['paradigm'] + ": \"" + move_text + "\" is not a legal move. "
-                error_data['destination'] = "/game/" + id + "/textplay"
-                return template('error', **error_data)
+                illegal_move = move_text
         except AssertionError as e:
+            illegal_move = move_text
             error_data['error_message'] = "" + game['info']['paradigm'] + ": \"" + move_text + "\" is not a legal move. " + str(e)
             error_data['destination'] = "/game/" + id + "/textplay"
             return template('error', **error_data)
 
-        updated_game_state = paradigm.update(game_state, move, my_seat)
-        game['state'] = updated_game_state
-        game['status']['turn_count'] += 1
-        if hasattr(paradigm, 'score'):
-            score_result = paradigm.score(updated_game_state,)
-            game['status']['score'] = score_result
-            if score_result.get("game_over", False):
-                game['status']['is_finished'] = True
-        process_turn_info()
+        if not illegal_move:
+            updated_game_state = paradigm.update(game_state, move, my_seat)
+            game['state'] = updated_game_state
+            game['status']['turn_count'] += 1
+            if hasattr(paradigm, 'score'):
+                score_result = paradigm.score(updated_game_state,)
+                game['status']['score'] = score_result
+                if score_result.get("game_over", False):
+                    game['status']['is_finished'] = True
+            process_turn_info()
 
     view = text_handler['view']
     try:
-        print('game state', game['state'])
+        #print('game state', game['state'])
         game_text = view(game['state'])
     except Exception as e:
         error_data['error_message'] = "" + game['info']['paradigm'] + ": error rendering view. " + str(e)
@@ -482,26 +484,20 @@ def game_play_text(id):
         (square_link_template % (name, name, value)) if my_turn else (static_square_template % value))
 
     # todo handle csvView
-    if 'csvNames' in text_handler:
-        names = re.split(',\s+', text_handler['csvNames'])
+    if 'squareNames' in text_handler:
+        names = re.split(',\s+', text_handler['squareNames'])
         lines = [list(filter((lambda x: x != " "), list(line))) for line in game_text.split("\n")]
-        # print('lines', lines)
         values = []
         for line in lines:
             if len(line) > 0:
                 line[-1] += "\n"
             values.extend(line)
         squares = zip(names, values)
-        # print('squares', squares)
         game_text = "".join([render_square(name, value) for (name, value) in squares])
-        # print('game_text', game_text)
 
-    # print(game_text)
     move_list = None
     if "moves" in text_handler:
         move_list = text_handler['moves'](game['state'])
-
-    #print("move_list", move_list)
 
     template_data = {
         "game_id" : id,
@@ -516,6 +512,8 @@ def game_play_text(id):
         "turn_count" : turn_count,
         "status" : game['status'],
         "score" : game['status'].get('score', None),
+        "illegal_move" : illegal_move,
+        "multi_move" : text_handler.get("multiMove", False),
     }
 
     # save data

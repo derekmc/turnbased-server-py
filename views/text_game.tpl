@@ -19,11 +19,25 @@
       </script>
     %end
     <script>
+        function submitMove(){
+            document.move_input_form.submit();
+        }
         function squareClick(square_name){
             var move_text_input = document.getElementById("move_text_input");
             var square_elem = document.getElementById("square_" + square_name);
             if(move_text_input.value.length){
-                move_text_input.value += "-"; }
+                var squares = move_text_input.value.split('-');
+                %if multi_move: # mixing template conditionals and client conditionals, lol.
+                    last_square = squares[squares.length - 1];
+                    if(last_square == square_name){
+                        submitMove();
+                        return; }
+                    move_text_input.value += "-";
+                %else:
+                    move_text_input.value += "-" + square_name;
+                    submitMove()
+                %end
+            }
             move_text_input.value += square_name;
             square_elem.classList.add('clicked');
         }
@@ -47,32 +61,20 @@
     </div>
     <div class="main">
       <br>
-      <h1> {{ game_name.strip() }} Text Play </h1>
-      %if len(info.get('version', '')):
-        <h3> Version {{info['version']}}</h3>
-      %end
+      <h1> {{ game_name.strip() }}
+        %if len(info.get('version', '')):
+          ({{info['version']}})
+        %end
+      </h1>
 
       %if not status["is_started"]: # required attribute should be present.
         Game has not started (how are you even here?)
       %elif not status["is_finished"]:
-        <!-- TODO handle seat scores and seat ranks -->
-        <b>{{!"Your Move" if my_turn else "Player " + str(turn_index) + "'s Turn."}}</b>
-        <br><br>
-        %if my_turn:
-          %if move_list:
-            %for move in move_list:
-              <form method="POST">
-                <input type="hidden" name="move_text" value="{{move}}">
-                <input type="submit" value="{{move}}"/>
-              </form>
-            %end
-          %else:
-            <form method="POST">
-              <input id="move_text_input" name="move_text" type="text" title="(example: (example_move goes here))">
-              <input type="submit" value="Submit"/>
-            </form>
-            <button onclick="clearMove()">Clear</button>
-          %end
+        %if illegal_move:
+          <p class="error_message"> Player {{! str(turn_index)}} Illegal move: {{illegal_move}} </p>
+        %else:
+          <!-- TODO handle seat scores and seat ranks -->
+          <p class="banner_message">{{!"Your Move, \"Player " + str(turn_index) + "\"." if my_turn else "Player " + str(turn_index) + "'s Turn."}}</p>
         %end
       %else:
         Game finished.
@@ -99,10 +101,28 @@
       %end
 
       <div style="font-size: 160%; font-family: monospace;">
-        <div style="text-align: center">{{! game_text.replace('\n','<br>') }}</pre>
+        <div style="text-align: center">{{! game_text.replace('\n','<br>') }}</div>
       </div>
-      %if status['is_started'] and not status['is_finished'] and not my_turn:
-        <a href="./textplay">Refresh</a>
+      %if status['is_started'] and not status['is_finished']:
+        %if not my_turn:
+          <a href="./textplay">Refresh</a>
+        %else:
+          %if move_list:
+            %for move in move_list:
+              <form method="POST" name="move_input_form">
+                <input type="hidden" name="move_text" value="{{move}}">
+                <input type="submit" value="{{move}}"/>
+              </form>
+            %end
+          %else:
+            <form method="POST" name="move_input_form">
+              <input id="move_text_input" name="move_text" type="text" title="(example: (example_move goes here))">
+              <input type="submit" value="Submit"/>
+            </form>
+            <button onclick="clearMove()">Clear</button>
+          %end
+        %end
+
       %end
       <hr>
       <span style="font-size: 10pt;">
