@@ -141,6 +141,9 @@ def __set_board(board, pos, piece):
 
 def __is_valid_move(board, pos_list):
 
+    if len(pos_list) < 2: # must move to a new square
+        return False
+
     single_step = (len(pos_list) == 2)
 
     for i in range(len(pos_list) - 1):
@@ -151,6 +154,10 @@ def __is_valid_move(board, pos_list):
         dy = b[1] - a[1]
         adx = abs(dx)
         ady = abs(dy)
+
+        # must move to new square.
+        if dx == 0 and dy == 0:
+            return False
 
         # midpoint of a, b
         c = (a[0] + int(dx/2), a[1] + int(dy/2))
