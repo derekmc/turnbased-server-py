@@ -74,9 +74,13 @@
           <p class="error_message"> Player {{! str(turn_index)}}  Illegal move: {{illegal_move}} </p>
         %else:
           <!-- TODO handle seat scores and seat ranks -->
+
           % move_prompt = "Your Move"
           % if turn_index:
-          %    move_prompt += ", \"Player " + str(turn_index)
+          %    if
+          %    move_prompt += ", \"Player " + str(turn_index) + "\"."
+          % else:
+          %    
           % end
           % if 
 
