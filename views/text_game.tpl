@@ -71,9 +71,15 @@
         Game has not started (how are you even here?)
       %elif not status["is_finished"]:
         %if illegal_move:
-          <p class="error_message"> Player {{! str(turn_index)}} Illegal move: {{illegal_move}} </p>
+          <p class="error_message"> Player {{! str(turn_index)}}  Illegal move: {{illegal_move}} </p>
         %else:
           <!-- TODO handle seat scores and seat ranks -->
+          % move_prompt = "Your Move"
+          % if turn_index:
+          %    move_prompt += ", \"Player " + str(turn_index)
+          % end
+          % if 
+
           <p class="banner_message">{{!"Your Move, \"Player " + str(turn_index) + "\"." if my_turn else "Player " + str(turn_index) + "'s Turn."}}</p>
         %end
       %else:

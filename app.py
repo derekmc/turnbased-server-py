@@ -521,6 +521,35 @@ def game_play_text(id):
     if "moves" in text_handler:
         move_list = text_handler['moves'](game['state'])
 
+    seat_count = sum(x is not "" for x in seats)
+    is_seated = False
+    filtered_seats = []
+    cookie_seats = {}
+    is_multi_player = False
+    player_index = None
+    #### print('seat', seats, 'cookie', cookie)
+    for i in range(len(seats)):
+        seat_cookie = seats[i]
+        if seat_cookie == cookie:
+            is_seated = True
+        if len(seat_cookie):
+            cookie_seat_list = cookie_seats.get(seat_cookie, [])
+            cookie_seat_list.append(i + 1)
+            if turn_index:
+                if i == turn_index -1:
+                    player_index = cookie_seat_list[0]
+                if len(cookie_seat_list) > 1:
+                    is_multi_player = True
+            cookie_seats[seat_cookie] = cookie_seat_list
+            if seat_cookie == cookie:
+                filtered_seats.append("me")
+            else:
+                player_index = cookie_seat_list[0]
+                filtered_seats.append(str(player_index))
+        else:
+            filtered_seats.append("")
+    if 
+
     template_data = {
         "game_id" : id,
         "game_name" : info['paradigm'],
@@ -530,6 +559,8 @@ def game_play_text(id):
         "seats" : ["x" if len(seat) else "" for seat in seats],
         "my_seat" : my_seat,
         "my_turn" : my_turn,
+        "player_index" : player_index,
+        "is_multi_player" : is_multi_player,
         "turn_index" : turn_index,
         "turn_count" : turn_count,
         "status" : game['status'],
