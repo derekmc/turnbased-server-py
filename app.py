@@ -235,6 +235,7 @@ def game_lobby(id):
     is_seated = False
     filtered_seats = []
     cookie_seats = {}
+    #### print('seat', seats, 'cookie', cookie)
     for i in range(len(seats)):
         seat_cookie = seats[i]
         if seat_cookie == cookie:
@@ -296,6 +297,8 @@ def game_sit(id):
     status = game['status']
     allow_seating = info.get('live_seating', False) or not status['is_started']
     sit_index = int(request.forms.get("seat_index"))
+    multi_sit = info.get('multi_sit', False)
+    is_seated = cookie in seats
     if not allow_seating:
         error_data['error_message'] = "Game started. Sitting or standing not allowed."
         return template('error', **error_data)
@@ -311,11 +314,14 @@ def game_sit(id):
                     seats[sit_index-1] = ""
                     if not (cookie in seats):
                         player_games_set.remove(id)
-            else:
+            elif not is_seated or multi_sit:
                 if sit_index == 0:
                     sit_index = 1
                     while sit_index - 1 < len(seats) and seats[sit_index - 1] != "":
                         sit_index += 1
+                print('sit_index', sit_index)
+                seat = seats[sit_index - 1] if sit_index - 1 < len(seats) else ""
+                # ensure at least one empty slot in seats
                 if sit_index > info['max_players']:
                     error_data['error_message'] = "Could not sit. Only " + str(info['max_players']) + " allowed."
                     return template('error', **error_data)
@@ -323,12 +329,15 @@ def game_sit(id):
                     # fill in rest of blank seats
                     seats = seats + [""] * (sit_index - len(seats))
                     game['seats'] = seats
-                if seats[sit_index - 1] == "":
+                if seat == "":
                     seats[sit_index - 1] = cookie
                     player_games_set.add(id)
                 else:
                     error_data['error_message'] = "Could not sit. Seat " + str(sit_index) + " taken."
                     return template('error', **error_data)
+            else:
+                error_data['error_message'] = "Could not sit because you were already seated and multi-sit is not allowed."
+                return template('error', **error_data)
 
     data.save_if_time()
     return redirect('/game/' + id + '/lobby')
@@ -430,10 +439,7 @@ def game_play_text(id):
             "player_count" : player_count
         }
         #print(init_args)
-
         game['state'] = paradigm.init(init_args)
-
-
         status['is_started'] = True
 
     process_turn_info()
