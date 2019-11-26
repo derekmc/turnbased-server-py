@@ -91,3 +91,10 @@ input[type=submit], button{
   user-select: none;
 }
 
+#text_play_main {
+  font-size: 160%;
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+  /*text-align: center;*/
+}

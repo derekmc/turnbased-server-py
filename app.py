@@ -135,6 +135,7 @@ def games_new_page():
     min_players = int(request.forms.get('min_players'))
     max_players = int(request.forms.get('max_players'))
     live_seating = request.forms.get('live_seating', 'off') == 'on'
+    multi_sit = request.forms.get('multi_sit', 'off') == 'on'
     choose_seats = request.forms.get('choose_seats') == 'on'
     enforce_turn_sequence = request.forms.get('enforce_turn_sequence', 'on') == 'on'
 
@@ -162,6 +163,7 @@ def games_new_page():
         'max_players': max_players,
         'choose_seats': paradigm_info.get('allow_choose_seats', True) and choose_seats,
         'live_seating': paradigm_info.get('allow_live_seating', False) and live_seating,
+        'multi_sit' : multi_sit,
         'enforce_turn_sequence' : "default_turn_sequence" in paradigm_info or
                                   paradigm_info.get('require_enforce_turn_sequence', True) or 
                                   enforce_turn_sequence,
@@ -230,15 +232,28 @@ def game_lobby(id):
     status = game['status']
     allow_seating = info.get('live_seating', False) or not status['is_started']
     seat_count = sum(x is not "" for x in seats)
-    my_seat = 0
+    is_seated = False
+    filtered_seats = []
+    cookie_seats = {}
     for i in range(len(seats)):
-        if seats[i] == cookie:
-            my_seat = i + 1
-    can_start = my_seat > 0 and (not status['is_started']) and seat_count >= info.get('min_players', 0)
-    filtered_seats = ["x" if len(seat) else "" for seat in seats]
+        seat_cookie = seats[i]
+        if seat_cookie == cookie:
+            is_seated = True
+        if len(seat_cookie):
+            cookie_seat_list = cookie_seats.get(seat_cookie, [])
+            cookie_seat_list.append(i + 1)
+            cookie_seats[seat_cookie] = cookie_seat_list
+            if seat_cookie == cookie:
+                filtered_seats.append("me")
+            else:
+                player_index = cookie_seat_list[0]
+                filtered_seats.append(str(player_index))
+        else:
+            filtered_seats.append("")
+    can_start = is_seated and (not status['is_started']) and seat_count >= info.get('min_players', 0)
+
     #print("seat count, min_seats, can_start", seat_count, info.get('min_players', 0), can_start)
 
-    #print("user 'my_seat'", my_seat)
     #print("seats", seats)
 
     template_data = {
@@ -247,14 +262,14 @@ def game_lobby(id):
         "allow_seating" : allow_seating,
         "info" : info,
         "status" : status,
+        "is_seated" : is_seated,
         "seats" : filtered_seats,
-        "my_seat" : my_seat,
         "error_message" : error_message,
     }
 
     return template('lobby', **template_data)
 
-# seat_index of -1 is used to stand.
+# a negative sit_index is used to stand from the specified seat.
 @app.route('/game/<id:re:[a-zA-Z]*>/sit', method="POST")
 def game_sit(id):
     #print("Game Sit called.")
@@ -288,12 +303,14 @@ def game_sit(id):
         if sit_index != None:
             #print("sitting:", sit_index)
             if sit_index < 0:
-                if not cookie in seats:
-                    error_data['error_message'] = "Could not stand. Perhaps you are not seated?"
+                sit_index = -sit_index
+                if sit_index > len(seats) or seats[sit_index - 1] != cookie:
+                    error_data['error_message'] = "Could not stand from seat %s. Perhaps you are not seated there?" % (sit_index)
                     return template('error', **error_data)
                 else:
-                    seats[seats.index(cookie)] = ""
-                    player_games_set.remove(id)
+                    seats[sit_index-1] = ""
+                    if not (cookie in seats):
+                        player_games_set.remove(id)
             else:
                 if sit_index == 0:
                     sit_index = 1
@@ -397,7 +414,7 @@ def game_play_text(id):
             return template('error', **error_data)
 
         # remove empty seats
-        # randomize seating if choose_seats is allowed
+        # randomize seating if choose_seats is not allowed
         seats = [seat for seat in seats if len(seat)]
         # print('seat order', seats)
         if not info['choose_seats']:

@@ -63,6 +63,7 @@ GameInfo = {
    # Values for the following properties are restricted based on the paradigms value
    "$live_seating" : False, # may only be true if "allow_live_seating" is True.
    "$choose_seats" : False, # may only be true if "allow_choose_seats" is True.
+   "$multi_sit" : False, # allow a player to take multiple seats.  Useful for debugging.
    "$enforce_turn_sequence" : True, # must be true if "require_enforce_turn_sequence" is True.
    "$turn_sequence" : [0], # TODO copied from "default_turn_sequence", unless the initialized state has a key called "turn_sequenc"
 }
