@@ -230,6 +230,7 @@ def init(init_args):
 def verify(data, move, seat):
     board = parse_board(data['board'])
     piece = __get_board(board, move[0])
+    assert piece == seat, "not your piece"
 
     # TODO validation of datstructures.
     return __is_valid_move(board, move)
