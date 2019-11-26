@@ -100,7 +100,7 @@
         %end
       %end
 
-      <div style="font-size: 160%; font-family: monospace;">
+      <div style="font-size: 160%; font-family: monospace; display: flex; justify-content: center; /*overflow-x: scroll;*/">
         <div style="text-align: center">{{! game_text.replace('\n','<br>') }}</div>
       </div>
       %if status['is_started'] and not status['is_finished']:
