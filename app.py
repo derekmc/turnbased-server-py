@@ -319,7 +319,6 @@ def game_sit(id):
                     sit_index = 1
                     while sit_index - 1 < len(seats) and seats[sit_index - 1] != "":
                         sit_index += 1
-                print('sit_index', sit_index)
                 seat = seats[sit_index - 1] if sit_index - 1 < len(seats) else ""
                 # ensure at least one empty slot in seats
                 if sit_index > info['max_players']:
