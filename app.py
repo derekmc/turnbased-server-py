@@ -572,6 +572,13 @@ def game_play_text(id):
                     end_game_message += "You won: "
                 else:
                     end_game_message += "Winner(s): "
+                winner_player_number = None
+                try: # catch any index errors
+                    winner_cookie = seats[winner - 1]
+                    cookie_seat_list = cookie_seats.get(winner_cookie, [])
+                    winner_player_number = cookie_seat_list[0]
+                except:
+                    pass
                 end_game_message += "Player " + str(player_number)
                 if is_multi_player:
                     end_game_message += ", Seat " + str(winner)
@@ -582,7 +589,14 @@ def game_play_text(id):
                     end_game_message += "You lost: "
                 else:
                     end_game_message += "Loser(s): "
-                end_game_message += "Player " + str(player_number)
+                loser_player_number = None
+                try: # catch any index errors
+                    loser_cookie = seats[loser - 1]
+                    cookie_seat_list = cookie_seats.get(loser_cookie, [])
+                    loser_player_number = cookie_seat_list[0]
+                except:
+                    pass
+                end_game_message += "Player " + str(loser_player_number)
                 if is_multi_player:
                     end_game_message += ", Seat " + str(loser)
                 
