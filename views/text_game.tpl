@@ -25,19 +25,30 @@
         function squareClick(square_name){
             var move_text_input = document.getElementById("move_text_input");
             var square_elem = document.getElementById("square_" + square_name);
-            if(move_text_input.value.length){
-                var squares = move_text_input.value.split('-');
-                %if multi_move: # mixing template conditionals and client conditionals, lol.
-                    last_square = squares[squares.length - 1];
-                    if(last_square == square_name){
-                        submitMove();
-                        return; }
-                    move_text_input.value += "-";
-                %else:
+            var move_text = move_text_input.value;
+            //if(move_text.length){
+            var squares = move_text.split('-');
+            %if multi_move: # mixing template conditionals and client conditionals, lol.
+                last_square = squares[squares.length - 1];
+                if(last_square == square_name){
+                    submitMove();
+                    return; }
+                if(move_text.length) move_text_input.value += "-";
+                move_text_input.value += square_name;
+            %elif single_move: # one square move
+                move_text_input.value += square_name;
+                submitMove()
+                return;
+            %else: # two square move
+                var move_started = move_text.length > 0;
+                if(move_started){
                     move_text_input.value += "-" + square_name;
-                    submitMove()
-                %end
-            }
+                    submitMove();
+                    return; }
+                else{
+                    move_text_input.value += square_name; }
+            %end
+           
             move_text_input.value += square_name;
             square_elem.classList.add('clicked');
         }

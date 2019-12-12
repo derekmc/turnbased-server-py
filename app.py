@@ -507,7 +507,7 @@ def game_play_text(id):
 
     # todo handle csvView
     if 'squareNames' in text_handler:
-        names = re.split(',\s+', text_handler['squareNames'])
+        names = re.split(',\s*', text_handler['squareNames'])
         lines = [list(filter((lambda x: x != " "), list(line))) for line in game_text.split("\n")]
         values = []
         for line in lines:
@@ -600,6 +600,7 @@ def game_play_text(id):
                 if is_multi_player:
                     end_game_message += ", Seat " + str(loser)
                 
+    # print("game_text", game_text)
 
     template_data = {
         "game_id" : id,
@@ -619,6 +620,7 @@ def game_play_text(id):
         "score" : game['status'].get('score', None),
         "illegal_move" : illegal_move,
         "multi_move" : text_handler.get("multiMove", False),
+        "single_move" : text_handler.get("singleMove", False),
         "end_game_message": end_game_message,
     }
 

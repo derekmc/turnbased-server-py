@@ -79,6 +79,7 @@ TextHandler = {
     "$squareNames" : None, # csv list mapping table positions to square names
     "$moves" : None, # optional function computing legal moves
     "$multiMove": False, # indicates a move is not only between two squares.
+    "$singleMove": False, # indicates only a single square is selected.
     # "$csvView" : None, # function returning comma separated table. TODO Leading and trailing subscripts and superscripts. ^cost _attack Card-Info _defense;
 }
 
