@@ -7,7 +7,7 @@
     <script src="/static/auto_refresh.js"></script>
     <script>
       var game_id = "{{ game_id }}"
-      var my_seat = "{{ my_seat }}"
+      var is_seated = "{{!"true" if is_seated else "false"}}"
 
       /*
       function sit(seat){
@@ -32,7 +32,10 @@
       Game - <b><i>{{info['paradigm']}}</i></b> <br><br>
       <table class="listtable" style="min-width: 240px;">
         <tr><th> Seat </th> <th> Player </th></tr>
+        %multi_sit = info.get('multi_sit', False)
+        %choose_seats = info.get('choose_seats', True)
         %for i in range(int(info['max_players'])):
+          %seat = seats[i] if i < len(seats) else ""
           <tr>
             %# bold the required seats.
             <td>
@@ -43,18 +46,18 @@
               %end
             </td>
             <td>
-              %if int(my_seat) == i+1:
+              %if seat == "me":
                   %if allow_seating:
                     <form method="POST" action="./sit">
-                      <input id="seat_index" name="seat_index" type="hidden" value="-1"/>
+                      <input id="seat_index" name="seat_index" type="hidden" value="{{-(i+1)}}"/>
                       <input type="submit" value="Stand"> </input>
                     </form>
                   %else:
                     Seated
                   %end
-              %elif i < len(seats) and seats[i] != "":
-                Player {{i+1}}
-              %elif my_seat == 0 and info.get('choose_seats',True):
+              %elif seat != "":
+                Player {{seat}}
+              %elif (not is_seated or multi_sit) and choose_seats:
                 %if allow_seating:
                   <form method="POST" action="./sit">
                     <input id="seat_index" name="seat_index" type="hidden" value="{{i+1}}"/>
@@ -69,7 +72,7 @@
             </td>
           </tr>
         %end
-        %if not info.get('choose_seats',True) and my_seat == 0:
+        %if not info.get('choose_seats',True) and (info.get('multi_sit', True) or not is_seated):
           <td colspan=2>
             <form method="POST" action="./sit">
               <input id="seat_index" name="seat_index" type="hidden" value="0"/>
@@ -79,7 +82,7 @@
         %end
         <tr>
           <td colspan=2>
-            %if my_seat == 0:
+            %if not is_seated:
               <button disabled>
                 {{!"Enter" if status["is_started"] else "Start"}} Game
               </button>

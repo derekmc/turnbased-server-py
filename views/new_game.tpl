@@ -66,7 +66,10 @@
           <td colspan=2>
             <label for="choose_seats">Choose Seats</label>
             <input type="checkbox" name="choose_seats" id="choose_seats"></input>
+            <label for="multi_sit">Multi-Sit</label>
+            <input type="checkbox" name="multi_sit" id="multi_sit"></input>
           </td>
+
         </tr>
         <tr>
           <td colspan=2><input type="submit" value="Create Game"></input></td>

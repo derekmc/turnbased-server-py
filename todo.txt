@@ -1,3 +1,4 @@
+theres a difference between the player_number and the turn_player. -- 19.11.26
 Write documentation on 5 api functions: init, verify, update, view, score, also text_play funcs -- 19.11.23
 multisitting option, so one user can take multiple player seats, for testing, etc. -- 19.11.18
 make chinese checkers textplay clickable csv grid. -- 19.11.16

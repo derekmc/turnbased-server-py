@@ -135,6 +135,7 @@ def games_new_page():
     min_players = int(request.forms.get('min_players'))
     max_players = int(request.forms.get('max_players'))
     live_seating = request.forms.get('live_seating', 'off') == 'on'
+    multi_sit = request.forms.get('multi_sit', 'off') == 'on'
     choose_seats = request.forms.get('choose_seats') == 'on'
     enforce_turn_sequence = request.forms.get('enforce_turn_sequence', 'on') == 'on'
 
@@ -162,6 +163,7 @@ def games_new_page():
         'max_players': max_players,
         'choose_seats': paradigm_info.get('allow_choose_seats', True) and choose_seats,
         'live_seating': paradigm_info.get('allow_live_seating', False) and live_seating,
+        'multi_sit' : multi_sit,
         'enforce_turn_sequence' : "default_turn_sequence" in paradigm_info or
                                   paradigm_info.get('require_enforce_turn_sequence', True) or 
                                   enforce_turn_sequence,
@@ -230,15 +232,30 @@ def game_lobby(id):
     status = game['status']
     allow_seating = info.get('live_seating', False) or not status['is_started']
     seat_count = sum(x is not "" for x in seats)
-    my_seat = 0
+    is_seated = False
+    player_number = 0
+    filtered_seats = []
+    cookie_seats = {}
+    #### print('seat', seats, 'cookie', cookie)
     for i in range(len(seats)):
-        if seats[i] == cookie:
-            my_seat = i + 1
-    can_start = my_seat > 0 and (not status['is_started']) and seat_count >= info.get('min_players', 0)
-    filtered_seats = ["x" if len(seat) else "" for seat in seats]
+        seat_cookie = seats[i]
+        if seat_cookie == cookie:
+            is_seated = True
+        if len(seat_cookie):
+            cookie_seat_list = cookie_seats.get(seat_cookie, [])
+            cookie_seat_list.append(i + 1)
+            cookie_seats[seat_cookie] = cookie_seat_list
+            if seat_cookie == cookie:
+                filtered_seats.append("me")
+            else:
+                player_number = cookie_seat_list[0]
+                filtered_seats.append(str(player_number))
+        else:
+            filtered_seats.append("")
+    can_start = is_seated and (not status['is_started']) and seat_count >= info.get('min_players', 0)
+
     #print("seat count, min_seats, can_start", seat_count, info.get('min_players', 0), can_start)
 
-    #print("user 'my_seat'", my_seat)
     #print("seats", seats)
 
     template_data = {
@@ -247,14 +264,14 @@ def game_lobby(id):
         "allow_seating" : allow_seating,
         "info" : info,
         "status" : status,
+        "is_seated" : is_seated,
         "seats" : filtered_seats,
-        "my_seat" : my_seat,
         "error_message" : error_message,
     }
 
     return template('lobby', **template_data)
 
-# seat_index of -1 is used to stand.
+# a negative sit_index is used to stand from the specified seat.
 @app.route('/game/<id:re:[a-zA-Z]*>/sit', method="POST")
 def game_sit(id):
     #print("Game Sit called.")
@@ -281,6 +298,8 @@ def game_sit(id):
     status = game['status']
     allow_seating = info.get('live_seating', False) or not status['is_started']
     sit_index = int(request.forms.get("seat_index"))
+    multi_sit = info.get('multi_sit', False)
+    is_seated = cookie in seats
     if not allow_seating:
         error_data['error_message'] = "Game started. Sitting or standing not allowed."
         return template('error', **error_data)
@@ -288,17 +307,21 @@ def game_sit(id):
         if sit_index != None:
             #print("sitting:", sit_index)
             if sit_index < 0:
-                if not cookie in seats:
-                    error_data['error_message'] = "Could not stand. Perhaps you are not seated?"
+                sit_index = -sit_index
+                if sit_index > len(seats) or seats[sit_index - 1] != cookie:
+                    error_data['error_message'] = "Could not stand from seat %s. Perhaps you are not seated there?" % (sit_index)
                     return template('error', **error_data)
                 else:
-                    seats[seats.index(cookie)] = ""
-                    player_games_set.remove(id)
-            else:
+                    seats[sit_index-1] = ""
+                    if not (cookie in seats):
+                        player_games_set.remove(id)
+            elif not is_seated or multi_sit:
                 if sit_index == 0:
                     sit_index = 1
                     while sit_index - 1 < len(seats) and seats[sit_index - 1] != "":
                         sit_index += 1
+                seat = seats[sit_index - 1] if sit_index - 1 < len(seats) else ""
+                # ensure at least one empty slot in seats
                 if sit_index > info['max_players']:
                     error_data['error_message'] = "Could not sit. Only " + str(info['max_players']) + " allowed."
                     return template('error', **error_data)
@@ -306,12 +329,15 @@ def game_sit(id):
                     # fill in rest of blank seats
                     seats = seats + [""] * (sit_index - len(seats))
                     game['seats'] = seats
-                if seats[sit_index - 1] == "":
+                if seat == "":
                     seats[sit_index - 1] = cookie
                     player_games_set.add(id)
                 else:
                     error_data['error_message'] = "Could not sit. Seat " + str(sit_index) + " taken."
                     return template('error', **error_data)
+            else:
+                error_data['error_message'] = "Could not sit because you were already seated and multi-sit is not allowed."
+                return template('error', **error_data)
 
     data.save_if_time()
     return redirect('/game/' + id + '/lobby')
@@ -337,7 +363,6 @@ def game_play_text(id):
     status = game['status']
     seats = game['seats']
     game_state = game['state']
-    my_seat = 0
     player_count = 0
     enforce_turns = info.get("enforce_turn_sequence", True)
     turn_sequence = None
@@ -346,33 +371,33 @@ def game_play_text(id):
         enforce_turns = True
     turn_count = status["turn_count"]
     my_turn = True
-    turn_index = None # if turn order is not enforced, turn_index is meaningless.
-    turn_count = status['turn_count']
+    seat_number = None # if turn order is not enforced, seat_number for the current turn is meaningless.
+    player_number = 0
     def process_turn_info():
         nonlocal my_turn
         nonlocal turn_count
-        nonlocal turn_index
+        nonlocal seat_number
         my_turn = True
         turn_count = status['turn_count']
         if enforce_turns:
             turn_remainder = turn_count % player_count
             # the turn index may only correspond with filled seats.
-            turn_index = 0
+            seat_number = 0
             while turn_remainder >= 0:
-                turn_index += 1
-                if turn_index > len(seats):
+                seat_number += 1
+                if seat_number > len(seats):
                     error_data['error_message'] = "Server error processing current turn."
                     error_data['destination'] = "/game/" + id + "/lobby"
                     return template('error', **error_data)
-                if len(seats[turn_index - 1]) > 0:
+                if len(seats[seat_number - 1]) > 0:
                     turn_remainder -= 1
             if turn_sequence is not None:
                 # if the turn sequence is less than the number of players, some won't ever get to move!
                 if turn_remainder >= len(turn_sequence):
                     print("Warning: turn sequence is less than player count.")
                     turn_remainder = turn_count % len(turn_sequence)
-                turn_index = turn_sequence[turn_index - 1]
-            if turn_index == my_seat:
+                seat_number = turn_sequence[seat_number - 1]
+            if seats[seat_number - 1] == cookie:
                 my_turn = True
             else:
                 my_turn = False
@@ -380,12 +405,12 @@ def game_play_text(id):
     for i in range(len(seats)):
         if len(seats[i]):
             player_count += 1
-        if seats[i] == cookie:
-            my_seat = i + 1
+        if seats[i] == cookie and player_number == 0:
+            player_number = i + 1
 
     if not status['is_started']:
         # make sure only players can start the game, not spectators.
-        if my_seat == 0:
+        if player_number == 0:
             error_data['error_message'] = "Game hasn't started."
             error_data['destination'] = "/game/" + id + "/lobby"
             return template('error', **error_data)
@@ -397,7 +422,7 @@ def game_play_text(id):
             return template('error', **error_data)
 
         # remove empty seats
-        # randomize seating if choose_seats is allowed
+        # randomize seating if choose_seats is not allowed
         seats = [seat for seat in seats if len(seat)]
         # print('seat order', seats)
         if not info['choose_seats']:
@@ -413,10 +438,7 @@ def game_play_text(id):
             "player_count" : player_count
         }
         #print(init_args)
-
         game['state'] = paradigm.init(init_args)
-
-
         status['is_started'] = True
 
     process_turn_info()
@@ -450,7 +472,7 @@ def game_play_text(id):
             return template('error', **error_data)
 
         try:
-            if not paradigm.verify(game_state, move, my_seat):
+            if not paradigm.verify(game_state, move, seat_number):
                 illegal_move = move_text
         except AssertionError as e:
             illegal_move = move_text
@@ -459,7 +481,7 @@ def game_play_text(id):
             return template('error', **error_data)
 
         if not illegal_move:
-            updated_game_state = paradigm.update(game_state, move, my_seat)
+            updated_game_state = paradigm.update(game_state, move, seat_number)
             game['state'] = updated_game_state
             game['status']['turn_count'] += 1
             if hasattr(paradigm, 'score'):
@@ -485,7 +507,7 @@ def game_play_text(id):
 
     # todo handle csvView
     if 'squareNames' in text_handler:
-        names = re.split(',\s+', text_handler['squareNames'])
+        names = re.split(',\s*', text_handler['squareNames'])
         lines = [list(filter((lambda x: x != " "), list(line))) for line in game_text.split("\n")]
         values = []
         for line in lines:
@@ -499,6 +521,87 @@ def game_play_text(id):
     if "moves" in text_handler:
         move_list = text_handler['moves'](game['state'])
 
+    seat_count = sum(x is not "" for x in seats)
+    is_seated = False
+    filtered_seats = []
+    cookie_seats = {}
+    is_multi_player = False
+    player_number = 0
+    #### print('seat', seats, 'cookie', cookie)
+    for i in range(len(seats)):
+        seat_cookie = seats[i]
+        if seat_cookie == cookie:
+            is_seated = True
+        if len(seat_cookie):
+            cookie_seat_list = cookie_seats.get(seat_cookie, [])
+            cookie_seat_list.append(i + 1)
+            if seat_number:
+                if i == seat_number -1:
+                    player_number = cookie_seat_list[0]
+                if len(cookie_seat_list) > 1:
+                    is_multi_player = True
+            cookie_seats[seat_cookie] = cookie_seat_list
+            if seat_cookie == cookie:
+                filtered_seats.append("me")
+            else:
+                player_number = cookie_seat_list[0]
+                filtered_seats.append(str(player_number))
+        else:
+            filtered_seats.append("")
+    #if 
+    move_prompt = ""
+    if seat_number > 0:
+       if my_turn:
+           move_prompt += "Your Turn: "
+       #move_prompt += "Turn: "
+       move_prompt += "<b>"
+       move_prompt += "Player " + str(player_number)
+       if is_multi_player:
+           move_prompt += ", Seat " + str(seat_number) + "."
+       move_prompt += "</b>"
+    else:
+       move_prompt = "No fixed turn sequence."
+
+    end_game_message = ""
+    score = game['status'].get('score', None)
+    if score:
+        if "winners" in score:
+            for winner in score["winners"]:
+                end_game_message += "<br>"
+                if seats[winner - 1] == cookie:
+                    end_game_message += "You won: "
+                else:
+                    end_game_message += "Winner(s): "
+                winner_player_number = None
+                try: # catch any index errors
+                    winner_cookie = seats[winner - 1]
+                    cookie_seat_list = cookie_seats.get(winner_cookie, [])
+                    winner_player_number = cookie_seat_list[0]
+                except:
+                    pass
+                end_game_message += "Player " + str(player_number)
+                if is_multi_player:
+                    end_game_message += ", Seat " + str(winner)
+        if "losers" in score:
+            for loser in score["losers"]:
+                end_game_message += "<br>"
+                if seats[loser - 1] == cookie:
+                    end_game_message += "You lost: "
+                else:
+                    end_game_message += "Loser(s): "
+                loser_player_number = None
+                try: # catch any index errors
+                    loser_cookie = seats[loser - 1]
+                    cookie_seat_list = cookie_seats.get(loser_cookie, [])
+                    loser_player_number = cookie_seat_list[0]
+                except:
+                    pass
+                end_game_message += "Player " + str(loser_player_number)
+                if is_multi_player:
+                    end_game_message += ", Seat " + str(loser)
+                
+    # print("game_text", game_text)
+
     template_data = {
         "game_id" : id,
         "game_name" : info['paradigm'],
@@ -506,14 +609,19 @@ def game_play_text(id):
         "game_text" : game_text,
         "move_list" : move_list,
         "seats" : ["x" if len(seat) else "" for seat in seats],
-        "my_seat" : my_seat,
+        #"my_seat" : my_seat,
         "my_turn" : my_turn,
-        "turn_index" : turn_index,
+        "player_number" : player_number,
+        "seat_number" : seat_number,
+        "is_multi_player" : is_multi_player,
+        "move_prompt": move_prompt,
         "turn_count" : turn_count,
         "status" : game['status'],
         "score" : game['status'].get('score', None),
         "illegal_move" : illegal_move,
         "multi_move" : text_handler.get("multiMove", False),
+        "single_move" : text_handler.get("singleMove", False),
+        "end_game_message": end_game_message,
     }
 
     # save data
