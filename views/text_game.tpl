@@ -48,8 +48,6 @@
                 else{
                     move_text_input.value += square_name; }
             %end
-           
-            move_text_input.value += square_name;
             square_elem.classList.add('clicked');
         }
         function clearMove(){
