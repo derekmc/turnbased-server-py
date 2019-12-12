@@ -6,7 +6,6 @@ info = {
     "paradigm": "Tic Tac Toe",
     "version": "dev",
     "allow_live_seating": False,
-    # TODO make sure turns go around the board counter clockwise, instead of in 
     "min_allowed_players": 2,
     "max_allowed_players": 2,
     "require_enforce_turn_sequence" : True,
