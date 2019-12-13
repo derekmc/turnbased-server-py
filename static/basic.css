@@ -12,8 +12,8 @@ body{
 .listtable th{ background: #014; color: #fff; padding: 0.8em; font-weight: normal; }
 table{
   border-spacing: 0; }
-
-h1 { text-transform: uppercase; }
+ul{ list-style-type: ' - '; padding-left: 1.33em; }
+li{ line-height: 1.8;}
 
 a:visited{ color: blue; }
 

@@ -12,7 +12,9 @@ last_save = datetime.datetime.now()
 # for now, the user_token is just their cookie
 games = {} # {"id": {state, info, status, chat, "seats": [user_token]}
 player_games = {} # {"user_token": [game_id]}
-cookies = set()  # { "woiSSeDJ" }
+user_ids = set()  # { "woiSSeDJ" }
+cookies = {}
+user_info = {} # semi-durable information about users. {"user_token": UserInfo}
        
 
 #"status": {seat_scores, seat_ranks, seat_winners, seat_losers, is_started, is_finished}
@@ -24,9 +26,11 @@ STATUS_FINISHED = "FINISHED"
 SeatIndex = 0
 NumericScore = 0
 SeatRank = 0 # a seat rank value of zero means no rank.
-UserToken = "example_token" # for now this is just the cookie
+UserID = "example_id" # for now this is just the cookie
+CookieToken = "example_cookie"
 GameID = "example_game_id"
 PlayerGames = {"" : set([""])} # for now this is just a string -> [string] dictionary.
+UserInfo = {"$is_admin": False}
 
 GameScore = { "$seat_scores": [NumericScore],
               "$seat_ranks": [SeatRank],
@@ -87,10 +91,16 @@ Game = { "state": None,
          "info": GameInfo,
          "status": GameStatus,
          "$chat": "",
-         "seats": [UserToken]}
+         "seats": [UserID]}
 
 def dump():
-    state = {"games": games, "player_games": player_games, "cookies": cookies}
+    state = {
+        "games": games,
+        "player_games": player_games,
+        "user_ids": user_ids,
+        "cookies" : cookies,
+        "user_info": user_info,
+    }
     try:
         with open(settings.DATA_FILE, 'wb') as f:
             pickle.dump(state, f)
@@ -104,13 +114,15 @@ def dump():
         print(e)
 
 def load():
-    global games, player_games, cookies
+    global games, player_games, user_ids, cookies, user_info
     try:
         with open(settings.DATA_FILE, 'rb') as f:
             state = pickle.load(f)
         games = T({"": Game}, state['games'])
         player_games = T(PlayerGames, state['player_games'])
-        cookies = T({UserToken}, state['cookies'])
+        user_ids = T({UserID}, state['user_ids'])
+        cookies = T({"": UserID}, state['cookies'])
+        user_info = T({"": UserInfo}, state['user_info'])
         if settings.VERBOSE:
             print("Data loaded successfully.")
     except FileNotFoundError as e:

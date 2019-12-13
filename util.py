@@ -1,5 +1,5 @@
 
-import string, random
+import string, random, hashlib
 
 def gen_token(length, chars=string.ascii_letters, taken=set(), tries = 4):
     for i in range(tries):

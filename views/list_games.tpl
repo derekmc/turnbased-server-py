@@ -6,9 +6,16 @@
   </head>
   <body>
     {{! nav_header }}
-    <h1> {{list_title}} Games </h1>
+    <h1> List Games </h1>
     <div id="main">
+      <ul>
+        <li><a href="/mygames"> My Games </a></li>
+        <li><a href="/opengames"> Open Games </a></li>
+        <li><a href="/activegames"> Active Games </a></li>
+        <li><a href="/finishedgames"> Finished Games </a></li>
+      </ul>
 
+     <h3> {{!list_title.title()}} Games </h3>
      <table class="listtable">
       %for game_info in game_list:
         <tr>

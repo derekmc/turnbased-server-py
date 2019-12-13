@@ -25,6 +25,8 @@ print("Template Path", bottle.TEMPLATE_PATH)
 with open(settings.NAV_FILE) as file:
     BaseTemplate.defaults['nav_header'] = file.read()
 
+BaseTemplate.defaults['is_admin'] = False
+BaseTemplate.defaults['is_logged_in'] = False
 
 game_paradigms = {}
 paradigm_info = {}
@@ -37,13 +39,17 @@ def get_session():
     # check if cookie is exists
     if cookie and cookie in data.cookies:
         data.save_if_time()
-        return cookie
-    cookie = util.gen_token(settings.COOKIE_LEN, tries=settings.GEN_ID_TRIES,
-                            taken=data.cookies, chars=string.ascii_letters.upper())
+        user_id = data.cookies[cookie]
+        return user_id
+    cookie = util.gen_token(settings.COOKIE_LEN, tries=settings.COOKIE_TRIES,
+                            taken=data.cookies)
+    user_id = util.gen_token(settings.USER_ID_LEN, tries=settings.GEN_ID_TRIES,
+                            taken=data.user_ids)
     response.set_cookie(settings.COOKIE_NAME, cookie)
-    data.cookies.add(cookie)
+    data.user_ids.add(user_id)
+    data.cookies[cookie] = user_id
     data.save_if_time()
-    return cookie
+    return user_id
 
 
 app = Bottle()
@@ -81,6 +87,10 @@ def list_game_info_helper(games, game_filter):
     game_info_list.sort(key=lambda x: {"Open":0, "Active": 1, "Finished": 2, "Aborted": 3}[x['play_state']])
     return T([data.GameListInfo], game_info_list)
 
+@app.route('/lists')
+def list_links():
+    get_session()
+    return template('list_links')
 
 
 @app.route('/opengames')
@@ -89,7 +99,8 @@ def open_games():
     game_info_list = list_game_info_helper(data.games,
         lambda game: game['play_state'] == "Open")
     data.save_if_time()
-    return template('list_games', game_list=game_info_list, list_title="Open")
+    return template('list_games', game_list=game_info_list, list_title="open")
+
 
 
 
@@ -99,22 +110,34 @@ def active_games():
     game_info_list = list_game_info_helper(data.games,
         lambda game: game['play_state'] == "Active")
     data.save_if_time()
-    return template('list_games', game_list=game_info_list, list_title="Active")
+    return template('list_games', game_list=game_info_list, list_title="active")
+
+@app.route('/finishedgames')
+def finished_games():
+    get_session()
+    game_info_list = list_game_info_helper(data.games,
+        lambda game: game['play_state'] == "Finished")
+    data.save_if_time()
+    return template('list_games', game_list=game_info_list, list_title="finished")
 
 
+@app.route('/admin')
+def admin():
+    return template('admin')
 
 @app.route('/mygames')
 def my_games():
     cookie = get_session()
     player_game_set = T(data.PlayerGames, data.player_games).get(cookie, set())
     player_game_dict = {}
+    # all the games a player has joined and not left, but only non-deleted games are listed.
     for game_id in player_game_set:
         player_game_dict[game_id] = data.games[game_id]
 
     game_info_list = list_game_info_helper(player_game_dict,
         lambda game: True)
     data.save_if_time()
-    return template('list_games', game_list=game_info_list, list_title="My")
+    return template('list_games', game_list=game_info_list, list_title="my")
 
 #newgame_template = SimpleTemplate(pages.new_game_tmpl)
 @app.route('/new', method='GET')
@@ -125,6 +148,7 @@ def games_new_page():
     }
     data.save_if_time()
     return template('new_game', data=_data)
+
 
 
 # TODO json api vs page navigation.
@@ -178,7 +202,7 @@ def games_new_page():
 
     #print('game_args', game_args)
 
-    game_id = util.gen_token(settings.GAME_ID_LEN)
+    game_id = util.gen_token(settings.GAME_ID_LEN, taken=data.games, tries=settings.GEN_ID_TRIES, chars=string.ascii_uppercase)
 
     game = T(data.Game, {
         "state": None,
@@ -194,6 +218,16 @@ def games_new_page():
 
     data.save_if_time()
     return redirect('/game/' + game_id + '/lobby')
+
+
+@app.route('/game/<id:re:[a-zA-Z]*>/delete', method="POST")
+def delete_game():
+    cookie = get_session()
+    pass
+    # if settings.ALL_ADMIN or data.user_info[]
+    
+
+    
 
 @app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="GET")
 #@app.route('/game/<id:re:[a-zA-Z]*>/lobby', method="POST")
