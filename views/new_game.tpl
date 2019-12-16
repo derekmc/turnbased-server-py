@@ -38,7 +38,7 @@
     </script>
   </head>
   <body>
-    {{! nav_header }}
+    % include('nav.tpl')
     <form method="POST">
     <h1> New Game </h1>
       <table>

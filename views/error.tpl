@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/static/basic.css">
   </head>
   <body>
-    {{! nav_header }}
+    % include('nav.tpl')
     <h1> Error </h1>
     <p class="error_message"> {{error_message}} </p>
     <a href="{{destination}}"> Continue </a>

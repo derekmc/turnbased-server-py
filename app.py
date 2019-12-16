@@ -22,11 +22,13 @@ abs_views_path = os.path.join(abs_app_dir_path, 'views')
 bottle.TEMPLATE_PATH.insert(0, abs_views_path )
 print("Template Path", bottle.TEMPLATE_PATH)
 
-with open(settings.NAV_FILE) as file:
-    BaseTemplate.defaults['nav_header'] = file.read()
+login_info = {
+    "logged_in": False,
+    "is_admin": False,
+}
 
-BaseTemplate.defaults['is_admin'] = False
-BaseTemplate.defaults['is_logged_in'] = False
+BaseTemplate.defaults['login_info'] = login_info
+login_info['logged_in'] = True
 
 game_paradigms = {}
 paradigm_info = {}

@@ -118,11 +118,11 @@ def load():
     try:
         with open(settings.DATA_FILE, 'rb') as f:
             state = pickle.load(f)
-        games = T({"": Game}, state['games'])
-        player_games = T(PlayerGames, state['player_games'])
-        user_ids = T({UserID}, state['user_ids'])
-        cookies = T({"": UserID}, state['cookies'])
-        user_info = T({"": UserInfo}, state['user_info'])
+        games = T({"": Game}, state.get('games', {}))
+        player_games = T(PlayerGames, state.get('player_games', {}))
+        user_ids = T({UserID}, state.get('user_ids', set()))
+        cookies = T({"": UserID}, state.get('cookies', {}))
+        user_info = T({"": UserInfo}, state.get('user_info', {}))
         if settings.VERBOSE:
             print("Data loaded successfully.")
     except FileNotFoundError as e:

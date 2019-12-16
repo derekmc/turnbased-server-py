@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/static/basic.css">
   </head>
   <body>
-    {{! nav_header }}
+    % include('nav.tpl')
     <h1> Turnbased Game Server </h1>
     <a href="/new">New Game</a><br><br>
     <a href="/list">List Games</a><br><br>

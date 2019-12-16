@@ -48,7 +48,7 @@
     </script>
   </head>
   <body>
-    {{! nav_header }}
+    % include('nav.tpl')
     <h1> My Games (TODO) </h1>
     <div id="main"></div>
   </body>

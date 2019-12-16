@@ -2,10 +2,10 @@
   <a href="/new"> New Game </a>
   <a href="/lists"> List Games </a>
   
-  %if is_admin:
+  %if login_info['is_admin']:
     <a href="/admin"> Admin </a>
   %end
-  %if is_logged_in:
+  %if login_info['logged_in']:
     <a href="/logout">Log Out</a>
   %else:
     <a href="/login">Log In</a>

@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="/static/basic.css">
   </head>
   <body>
-    {{! nav_header }}
+    % include('nav.tpl')
     <h1> Admin </h1>
     <div id="main">
 

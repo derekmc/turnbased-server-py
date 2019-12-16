@@ -63,7 +63,7 @@
   </head>
 
   <body>
-    {{! nav_header }}
+    % include('nav.tpl')
     <div class="overlay" onclick="window.location = window.location.pathname;">
       <h2> Page Idle </h2>
       <h3> Click to Refresh </h3>
