@@ -6,17 +6,10 @@
   </head>
   <body>
     % include('nav.tpl')
-    <h1> List Games </h1>
-    <div id="main">
-      <ul>
-        <li><a href="/mygames"> My Games </a></li>
-        <li><a href="/opengames"> Open Games </a></li>
-        <li><a href="/activegames"> Active Games </a></li>
-        <li><a href="/finishedgames"> Finished Games </a></li>
-      </ul>
-
-     <h3> {{!list_title.title()}} Games </h3>
-     <table class="listtable">
+    <h1> List Games</h1>
+    % include('game_nav.tpl')
+    <h3> {{!list_title.title()}} Games </h3>
+    <table class="listtable">
       %for game_info in game_list:
         <tr>
           %play_state = game_info['play_state']
@@ -32,7 +25,6 @@
       %if len(game_list) == 0:
         No {{list_title}} games.
       %end
-     </table>
-    </div>
+    </table>
   </body>
 </html>

@@ -15,6 +15,7 @@ table{
 ul{ list-style-type: ' - '; padding-left: 1.33em; }
 li{ line-height: 1.8;}
 
+h1, h2, h3{ margin: 0.25em; }
 a:visited{ color: blue; }
 
 .nav { position: absolute; display: block;

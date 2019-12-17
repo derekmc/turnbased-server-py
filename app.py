@@ -122,6 +122,19 @@ def finished_games():
     data.save_if_time()
     return template('list_games', game_list=game_info_list, list_title="finished")
 
+@app.route('/myfinishedgames')
+def my_finished_games():
+    cookie = get_session()
+    player_game_set = T(data.PlayerGames, data.player_games).get(cookie, set())
+    player_game_dict = {}
+    # all the games a player has joined and not left, but only non-deleted games are listed.
+    for game_id in player_game_set:
+        player_game_dict[game_id] = data.games[game_id]
+
+    game_info_list = list_game_info_helper(player_game_dict,
+        lambda game: game['play_state'] == "Finished")
+    data.save_if_time()
+    return template('list_games', game_list=game_info_list, list_title="my finished")
 
 @app.route('/admin')
 def admin():
@@ -137,7 +150,7 @@ def my_games():
         player_game_dict[game_id] = data.games[game_id]
 
     game_info_list = list_game_info_helper(player_game_dict,
-        lambda game: True)
+        lambda game: game['play_state'] != "Finished")
     data.save_if_time()
     return template('list_games', game_list=game_info_list, list_title="my")
 

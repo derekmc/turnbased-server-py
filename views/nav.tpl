@@ -1,6 +1,6 @@
 <span class="nav">
   <a href="/new"> New Game </a>
-  <a href="/lists"> List Games </a>
+  <a href="/mygames"> List Games </a>
   
   %if login_info['is_admin']:
     <a href="/admin"> Admin </a>

@@ -7,13 +7,6 @@
   <body>
     % include('nav.tpl')
     <h1> List Games</h1>
-    <div id="main">
-      <ul>
-        <li><a href="/mygames"> My Games </a></li>
-        <li><a href="/opengames"> Open Games </a></li>
-        <li><a href="/activegames"> Active Games </a></li>
-        <li><a href="/finishedgames"> Finished Games </a></li>
-      </ul>
-    </div>
+    % include('game_nav.tpl')
   </body>
 </html>
