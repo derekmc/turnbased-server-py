@@ -1,1 +1,1 @@
-python3 server.py || python server.py
+python3 -m turnbased.server || python -m turnbased.server

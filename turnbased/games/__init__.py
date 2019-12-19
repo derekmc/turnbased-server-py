@@ -17,6 +17,6 @@ try:
 except:
     __games_dir = "games"
 __modules = glob.glob(os.path.join(os.path.dirname(__file__), "*.py"))
-games = [ importlib.import_module(__games_dir + "." + os.path.basename(f)[:-3]) for f in __modules if os.path.isfile(f) and not f.endswith('__init__.py')]
+games = [ importlib.import_module("turnbased." + __games_dir + "." + os.path.basename(f)[:-3]) for f in __modules if os.path.isfile(f) and not f.endswith('__init__.py')]
 
 

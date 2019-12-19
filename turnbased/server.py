@@ -6,10 +6,9 @@ if sys.version_info[0] != 3:
     raise Exception("Python 3 required.")
 
 if __name__ == "__main__":
-    from app import app
-    import settings
-    from settings import ACCOUNTS_FILE as accts_file
-    import data
+    from turnbased.app import app
+    from turnbased import settings, data
+    from turnbased.settings import ACCOUNTS_FILE as accts_file
     #import accounts
     #import util
 

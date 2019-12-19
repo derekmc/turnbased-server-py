@@ -1,7 +1,7 @@
 
 
-import settings, sched, time, pickle, datetime
-
+import sched, time, pickle, datetime
+from turnbased import settings
 from value_types import typecheck as T
 
 # seconds to wait between saving

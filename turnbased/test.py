@@ -1,7 +1,7 @@
 
 from json import loads
 import unittest
-import games.nim as handler
+import turnbased.games.nim as handler
 
 GameScoreSchema = {
     "type": "object"

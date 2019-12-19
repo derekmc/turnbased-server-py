@@ -1,3 +1,3 @@
 cd /D "%~dp0"
-python server.py
+python -m turnbased.server
 pause

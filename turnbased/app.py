@@ -7,7 +7,8 @@ if sys.version_info[0] != 3:
 
 
 import json, string, copy, re, random
-import settings, util, data
+from turnbased import settings, util, data
+from turnbased.games import games
 
 from value_types import typecheck as T
 
@@ -15,10 +16,10 @@ import bottle
 from bottle import Bottle, request, response, template, abort, \
                    static_file, BaseTemplate, redirect
 
-from games import games
 
 abs_app_dir_path = os.path.dirname(os.path.realpath(__file__))
 abs_views_path = os.path.join(abs_app_dir_path, 'views')
+abs_static_path = os.path.join(abs_app_dir_path, 'static')
 bottle.TEMPLATE_PATH.insert(0, abs_views_path )
 print("Template Path", bottle.TEMPLATE_PATH)
 
@@ -62,7 +63,7 @@ def index():
 
 @app.route('/static/<filepath:re:.*>', method="GET")
 def static_resource(filepath):
-    return static_file(filepath, root="static")
+    return static_file(filepath, root=abs_static_path)
 
 def list_game_info_helper(games, game_filter):
     game_info_list = []
