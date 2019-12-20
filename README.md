@@ -1,4 +1,4 @@
-# turnbased-demo-py
+# turnbased-server-py
 
 This project is to allow people to rapidly prototype turnbased games into a playable state for testing and development.
 
