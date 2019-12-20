@@ -14,7 +14,7 @@ of all the correct server behavior:
  create a standardized straightforward client interface for playing the game.
  
  To see how this works, please refer to the implemented game examples:
-  * [nim.py](games/nim.py) - A very simple game where 2 players take turns removing one or two stones.  The player to take the last stone loses.
-  * [chinese_checkers.py](games/chinese_checkers.py) - A movement based game where player can jump pieces to try to get all their pieces to the other side.
+  * [nim.py](turnbased/games/nim.py) - A very simple game where 2 players take turns removing one or two stones.  The player to take the last stone loses.
+  * [chinese_checkers.py](turnbased/games/chinese_checkers.py) - A movement based game where player can jump pieces to try to get all their pieces to the other side.
   
 If you want to license use, please contact me.
