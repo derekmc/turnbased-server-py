@@ -14,7 +14,7 @@
         <tr>
           %play_state = game_info['play_state']
           %if play_state == "Active" or play_state == "Finished":
-            <td><a href='/game/{{game_info['id']}}/textplay'>{{game_info['id']}}</a></td>
+            <td><a target="_blank" href='/game/{{game_info['id']}}/textplay'>{{game_info['id']}}</a></td>
           %else:
             <td><a href='/game/{{game_info['id']}}/lobby'>{{game_info['id']}}</a></td>
           %end

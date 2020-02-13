@@ -87,17 +87,17 @@
                 {{!"Enter" if status["is_started"] else "Start"}} Game
               </button>
               %if status["is_started"]:
-                <a href="./textplay"><button> Spectate Game </button></a>
+                <a target="_blank" href="./textplay"><button> Spectate Game </button></a>
               %else:
                 <button disabled> Spectate Game </button>
               %end
             %else:
               %if status["is_started"]:
-                <a href="./textplay"><button>
+                <a target="_blank" href="./textplay"><button>
                   Enter Game
                 </button></a>
               %elif can_start:
-                <a href="./textplay"><button>
+                <a target="_blank" href="./textplay"><button>
                   Start Game
                 </button></a>
               %else:
