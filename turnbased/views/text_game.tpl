@@ -79,7 +79,7 @@
         Game has not started (how are you even here?)
       %elif not status["is_finished"]:
         %if illegal_move:
-          <p class="error_message"> Player {{! str(seat_number)}}  Illegal move: {{illegal_move}} </p>
+          <p class="error_message"> Player {{! str(seat_number)}} &mdash; Illegal move {{illegal_move}} </p>
         %else:
           <!-- TODO handle seat scores and seat ranks -->
 

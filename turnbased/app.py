@@ -523,12 +523,10 @@ def game_play_text(id):
 
         try:
             if not paradigm.verify(game_state, move, seat_number):
-                illegal_move = move_text
+                illegal_move = '"' + move_text + '"'
         except AssertionError as e:
-            illegal_move = move_text
-            error_data['error_message'] = "" + game['info']['paradigm'] + ": \"" + move_text + "\" is not a legal move. " + str(e)
-            error_data['destination'] = "/game/" + id + "/textplay"
-            return template('error', **error_data)
+            #illegal_move = move_text
+            illegal_move = '' + move_text + ' — ' + str(e) + '.'
 
         if not illegal_move:
             updated_game_state = paradigm.update(game_state, move, seat_number)
